@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { NODE_ENV } from "../config/config";
 import { AppError } from "../errors/app.error";
+import { ZodError } from "zod";
 
 export const errorHandler = (
     error: Error,
@@ -19,6 +20,19 @@ export const errorHandler = (
             statusCode: error.statusCode,
             isOperational: true,
             error: error.message,
+            ...(isDev && { stack: error.stack }),
+        });
+    }
+
+    if (error instanceof ZodError) {
+        return res.status(400).json({
+            statusCode: 400,
+            isOperational: true,
+            error: "Validation error",
+            details: error.issues.map((err) => ({
+                field: err.path.join("."),
+                message: err.message,
+            })),
             ...(isDev && { stack: error.stack }),
         });
     }
