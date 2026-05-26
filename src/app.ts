@@ -1,7 +1,7 @@
 import express from "express";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { errorHandler } from "./middlewares/error.handler";
 
 export const app = express();
 app.use(express.json());
+
+app.use(errorHandler);
