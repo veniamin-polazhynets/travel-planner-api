@@ -11,3 +11,15 @@ if (!process.env.DATABASE_URL) {
 }
 
 export const DATABASE_URL = process.env.DATABASE_URL;
+
+if (!process.env.ACCESS_TOKEN_SECRET) {
+    throw new Error("ACCESS_TOKEN_SECRET is missing");
+}
+
+export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+
+if (!process.env.REFRESH_TOKEN_SECRET) {
+    throw new Error("REFRESH_TOKEN_SECRET is missing");
+}
+
+export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
