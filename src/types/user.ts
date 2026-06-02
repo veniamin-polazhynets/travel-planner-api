@@ -23,3 +23,8 @@ export type AuthResponse = {
     refreshToken: string;
     accessToken: string;
 };
+
+export type UpdateUserDao = {
+    username?: string;
+    email?: string;
+};

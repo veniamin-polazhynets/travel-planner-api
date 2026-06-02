@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db/db";
 import { usersTable } from "../db/schema";
-import { CreateUserDao, User } from "../types/user";
+import { CreateUserDao, UpdateUserDao, User } from "../types/user";
 
 export const usersRepository = {
     async createUser(dao: CreateUserDao): Promise<User> {
@@ -44,5 +44,19 @@ export const usersRepository = {
                 tokenVersion: sql`${usersTable.tokenVersion} + 1`,
             })
             .where(eq(usersTable.id, userId));
+    },
+
+    async updateUser(userId: number, dao: UpdateUserDao): Promise<User> {
+        const [user] = await db
+            .update(usersTable)
+            .set(dao)
+            .where(eq(usersTable.id, userId))
+            .returning();
+
+        return user;
+    },
+
+    async deleteUser(userId: number): Promise<void> {
+        await db.delete(usersTable).where(eq(usersTable.id, userId));
     },
 };
