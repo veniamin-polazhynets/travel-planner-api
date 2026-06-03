@@ -8,6 +8,13 @@
       "when": 1779692589026,
       "tag": "0000_create-users-table",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780474613552,
+      "tag": "0001_fix-users-table-and-add-trips-table",
+      "breakpoints": true
     }
   ]
 }
