@@ -34,3 +34,20 @@ tripsRouter.get(
         }
     },
 );
+
+tripsRouter.get(
+    "/:id",
+    authMiddleware,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const result = await tripsService.getById(
+                +req.params.id,
+                req.user!.id,
+            );
+
+            res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+);

@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "../db/db";
 import { tripsTable } from "../db/schema";
 import { CreateTripDao, Trip } from "../types/trip";
@@ -16,5 +16,19 @@ export const tripsRepository = {
             .from(tripsTable)
             .where(eq(tripsTable.userId, userId))
             .orderBy(desc(tripsTable.createdAt));
+    },
+
+    async findByIdAndUserId(
+        tripId: number,
+        userId: number,
+    ): Promise<Trip | undefined> {
+        const [trip] = await db
+            .select()
+            .from(tripsTable)
+            .where(
+                and(eq(tripsTable.id, tripId), eq(tripsTable.userId, userId)),
+            );
+
+        return trip || undefined;
     },
 };
