@@ -21,4 +21,18 @@ export const tripsService = {
             budget: trip.budget,
         };
     },
+
+    async getUserTrips(userId: number): Promise<TripResponse[]> {
+        const trips = await tripsRepository.getAllByUserId(userId);
+
+        return trips.map((trip) => ({
+            id: trip.id,
+            title: trip.title,
+            country: trip.country,
+            city: trip.city,
+            startDate: trip.startDate,
+            endDate: trip.endDate,
+            budget: trip.budget,
+        }));
+    },
 };

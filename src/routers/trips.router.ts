@@ -20,3 +20,17 @@ tripsRouter.post(
         }
     },
 );
+
+tripsRouter.get(
+    "/",
+    authMiddleware,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const result = await tripsService.getUserTrips(req.user!.id);
+
+            res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
