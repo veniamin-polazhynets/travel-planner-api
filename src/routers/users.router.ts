@@ -13,7 +13,7 @@ usersRouter.get(
     authMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = await usersService.getUserProfile(req.user!.id);
+            const user = await usersService.getProfile(req.user!.id);
 
             res.status(200).json(user);
         } catch (error) {
@@ -28,7 +28,7 @@ usersRouter.patch(
     validateBody(updateUserSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await usersService.updateUserProfile(
+            const result = await usersService.updateProfile(
                 req.user!.id,
                 req.body,
             );
@@ -46,7 +46,7 @@ usersRouter.delete(
     validateBody(deleteUserSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await usersService.deleteUserProfile(req.user!.id, req.body);
+            await usersService.deleteAccount(req.user!.id, req.body);
 
             res.clearCookie("refreshToken", {
                 httpOnly: true,

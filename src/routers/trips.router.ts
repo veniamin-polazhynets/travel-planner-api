@@ -12,7 +12,7 @@ tripsRouter.post(
     validateBody(createTripSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const trip = await tripsService.createTrip(req.user!.id, req.body);
+            const trip = await tripsService.create(req.user!.id, req.body);
 
             res.status(201).json(trip);
         } catch (error) {
@@ -26,7 +26,7 @@ tripsRouter.get(
     authMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await tripsService.getUserTrips(req.user!.id);
+            const result = await tripsService.getAll(req.user!.id);
 
             res.status(200).json(result);
         } catch (error) {

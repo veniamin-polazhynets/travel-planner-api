@@ -4,17 +4,17 @@ import { tripsTable } from "../db/schema";
 import { CreateTripDao, Trip } from "../types/trip";
 
 export const tripsRepository = {
-    async createTrip(dao: CreateTripDao): Promise<Trip> {
+    async create(dao: CreateTripDao): Promise<Trip> {
         const [trip] = await db.insert(tripsTable).values(dao).returning();
 
         return trip;
     },
 
-    async getAllByUserId(userId: number): Promise<Trip[]> {
+    async findAllByUserId(id: number): Promise<Trip[]> {
         return await db
             .select()
             .from(tripsTable)
-            .where(eq(tripsTable.userId, userId))
+            .where(eq(tripsTable.userId, id))
             .orderBy(desc(tripsTable.createdAt));
     },
 

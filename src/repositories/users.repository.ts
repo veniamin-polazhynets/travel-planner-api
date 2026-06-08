@@ -4,17 +4,17 @@ import { usersTable } from "../db/schema";
 import { CreateUserDao, UpdateUserDao, User } from "../types/user";
 
 export const usersRepository = {
-    async createUser(dao: CreateUserDao): Promise<User> {
+    async create(dao: CreateUserDao): Promise<User> {
         const [user] = await db.insert(usersTable).values(dao).returning();
 
         return user;
     },
 
-    async findById(userId: number): Promise<User | undefined> {
+    async findById(id: number): Promise<User | undefined> {
         const [user] = await db
             .select()
             .from(usersTable)
-            .where(eq(usersTable.id, userId));
+            .where(eq(usersTable.id, id));
 
         return user || undefined;
     },
@@ -37,26 +37,26 @@ export const usersRepository = {
         return user || undefined;
     },
 
-    async incrementTokenVersion(userId: number): Promise<void> {
+    async incrementTokenVersion(id: number): Promise<void> {
         await db
             .update(usersTable)
             .set({
                 tokenVersion: sql`${usersTable.tokenVersion} + 1`,
             })
-            .where(eq(usersTable.id, userId));
+            .where(eq(usersTable.id, id));
     },
 
-    async updateUser(userId: number, dao: UpdateUserDao): Promise<User> {
+    async update(id: number, dao: UpdateUserDao): Promise<User> {
         const [user] = await db
             .update(usersTable)
             .set(dao)
-            .where(eq(usersTable.id, userId))
+            .where(eq(usersTable.id, id))
             .returning();
 
         return user;
     },
 
-    async deleteUser(userId: number): Promise<void> {
-        await db.delete(usersTable).where(eq(usersTable.id, userId));
+    async delete(id: number): Promise<void> {
+        await db.delete(usersTable).where(eq(usersTable.id, id));
     },
 };

@@ -4,13 +4,10 @@ import { TripResponse } from "../types/trip";
 import { CreateTripDto } from "../validation/trips/create-trip.schema";
 
 export const tripsService = {
-    async createTrip(
-        userId: number,
-        dto: CreateTripDto,
-    ): Promise<TripResponse> {
+    async create(userId: number, dto: CreateTripDto): Promise<TripResponse> {
         const tripData = { userId, ...dto, budget: dto.budget.toFixed(2) };
 
-        const trip = await tripsRepository.createTrip(tripData);
+        const trip = await tripsRepository.create(tripData);
 
         return {
             id: trip.id,
@@ -23,8 +20,8 @@ export const tripsService = {
         };
     },
 
-    async getUserTrips(userId: number): Promise<TripResponse[]> {
-        const trips = await tripsRepository.getAllByUserId(userId);
+    async getAll(userId: number): Promise<TripResponse[]> {
+        const trips = await tripsRepository.findAllByUserId(userId);
 
         return trips.map((trip) => ({
             id: trip.id,

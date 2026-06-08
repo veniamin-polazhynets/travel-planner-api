@@ -25,7 +25,7 @@ export const authService = {
 
         const hashedPassword = await bcryptHelper.hashPassword(dto.password);
 
-        const user = await usersRepository.createUser({
+        const user = await usersRepository.create({
             username: dto.username,
             email: dto.email,
             passwordHash: hashedPassword,
@@ -114,8 +114,8 @@ export const authService = {
         return { accessToken };
     },
 
-    async logout(userId: number): Promise<{ logoutMessage: string }> {
-        await usersRepository.incrementTokenVersion(userId);
+    async logout(id: number): Promise<{ logoutMessage: string }> {
+        await usersRepository.incrementTokenVersion(id);
 
         return {
             logoutMessage: "Successfully logged out",
