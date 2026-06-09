@@ -3,6 +3,7 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 import { validateBody } from "../middlewares/body-validation.middleware";
 import { createTripSchema } from "../validation/trips/create-trip.schema";
 import { tripsService } from "../services/trips.service";
+import { updateTripSchema } from "../validation/trips/update-trip.schema";
 
 export const tripsRouter = express.Router();
 
@@ -46,6 +47,39 @@ tripsRouter.get(
             );
 
             res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+tripsRouter.patch(
+    "/:id",
+    authMiddleware,
+    validateBody(updateTripSchema),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const result = await tripsService.update(
+                +req.params.id,
+                req.user!.id,
+                req.body,
+            );
+
+            res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+tripsRouter.delete(
+    "/:id",
+    authMiddleware,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await tripsService.delete(+req.params.id, req.user!.id);
+
+            res.sendStatus(204);
         } catch (error) {
             next(error);
         }

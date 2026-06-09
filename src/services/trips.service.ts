@@ -1,7 +1,12 @@
-import { ForbiddenError, NotFoundError } from "../errors/http.errors";
+import {
+    BadRequestError,
+    ForbiddenError,
+    NotFoundError,
+} from "../errors/http.errors";
 import { tripsRepository } from "../repositories/trips.repository";
-import { TripResponse } from "../types/trip";
+import { CreateTripDao, TripResponse } from "../types/trip";
 import { CreateTripDto } from "../validation/trips/create-trip.schema";
+import { UpdateTripDto } from "../validation/trips/update-trip.schema";
 
 export const tripsService = {
     async create(userId: number, dto: CreateTripDto): Promise<TripResponse> {
@@ -54,5 +59,52 @@ export const tripsService = {
             endDate: trip.endDate,
             budget: trip.budget,
         };
+    },
+
+    async update(
+        tripId: number,
+        userId: number,
+        dto: UpdateTripDto,
+    ): Promise<TripResponse> {
+        const trip = await tripsRepository.findById(tripId);
+
+        if (!trip) {
+            throw new NotFoundError("Trip not found");
+        }
+
+        if (trip.userId !== userId) {
+            throw new ForbiddenError("You can't edit this trip");
+        }
+
+        const { budget, ...restDto } = dto;
+
+        const tripData: Partial<Omit<CreateTripDao, "userId">> = {
+            ...restDto,
+            ...(budget !== undefined ? { budget: budget.toFixed(2) } : {}),
+        };
+
+        const updatedTrip = await tripsRepository.update(tripId, tripData);
+
+        if (!updatedTrip) {
+            throw new NotFoundError("Trip not found during update");
+        }
+
+        return {
+            id: updatedTrip.id,
+            title: updatedTrip.title,
+            country: updatedTrip.country,
+            city: updatedTrip.city,
+            startDate: updatedTrip.startDate,
+            endDate: updatedTrip.endDate,
+            budget: updatedTrip.budget,
+        };
+    },
+
+    async delete(tripId: number, userId: number): Promise<void> {
+        const deletedTrip = await tripsRepository.delete(tripId, userId);
+
+        if (!deletedTrip) {
+            throw new NotFoundError("Trip not found");
+        }
     },
 };

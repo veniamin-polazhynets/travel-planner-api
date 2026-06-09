@@ -20,5 +20,6 @@ export type Trip = {
     createdAt: Date;
     updatedAt: Date;
 };
-
 export type TripResponse = Omit<Trip, "userId" | "createdAt" | "updatedAt">;
+
+export type UpdateTripDao = Partial<Omit<CreateTripDao, "userId">>;
