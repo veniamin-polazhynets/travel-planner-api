@@ -1,4 +1,4 @@
-import { NotFoundError } from "../errors/http.errors";
+import { ForbiddenError, NotFoundError } from "../errors/http.errors";
 import { tripsRepository } from "../repositories/trips.repository";
 import { TripResponse } from "../types/trip";
 import { CreateTripDto } from "../validation/trips/create-trip.schema";
@@ -35,10 +35,14 @@ export const tripsService = {
     },
 
     async getById(tripId: number, userId: number): Promise<TripResponse> {
-        const trip = await tripsRepository.findByIdAndUserId(tripId, userId);
+        const trip = await tripsRepository.findById(tripId);
 
         if (!trip) {
             throw new NotFoundError("Trip not found");
+        }
+
+        if (trip.userId !== userId) {
+            throw new ForbiddenError("You can't read this trip");
         }
 
         return {

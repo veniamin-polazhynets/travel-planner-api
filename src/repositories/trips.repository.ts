@@ -18,16 +18,11 @@ export const tripsRepository = {
             .orderBy(desc(tripsTable.createdAt));
     },
 
-    async findByIdAndUserId(
-        tripId: number,
-        userId: number,
-    ): Promise<Trip | undefined> {
+    async findById(id: number): Promise<Trip | undefined> {
         const [trip] = await db
             .select()
             .from(tripsTable)
-            .where(
-                and(eq(tripsTable.id, tripId), eq(tripsTable.userId, userId)),
-            );
+            .where(eq(tripsTable.id, id));
 
         return trip || undefined;
     },
