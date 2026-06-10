@@ -1,11 +1,8 @@
-import {
-    BadRequestError,
-    ForbiddenError,
-    NotFoundError,
-} from "../errors/http.errors";
+import { ForbiddenError, NotFoundError } from "../errors/http.errors";
 import { tripsRepository } from "../repositories/trips.repository";
-import { CreateTripDao, TripResponse } from "../types/trip";
+import { CreateTripDao, TripArrayResponse, TripResponse } from "../types/trip";
 import { CreateTripDto } from "../validation/trips/create-trip.schema";
+import { QueryTripsDto } from "../validation/trips/query-trips.schema";
 import { UpdateTripDto } from "../validation/trips/update-trip.schema";
 
 export const tripsService = {
@@ -25,18 +22,39 @@ export const tripsService = {
         };
     },
 
-    async getAll(userId: number): Promise<TripResponse[]> {
-        const trips = await tripsRepository.findAllByUserId(userId);
+    async getMany(
+        userId: number,
+        dto: QueryTripsDto,
+    ): Promise<TripArrayResponse> {
+        const { data, totalTrips } = await tripsRepository.findManyByUserId(
+            userId,
+            dto.page,
+            dto.limit,
+        );
 
-        return trips.map((trip) => ({
-            id: trip.id,
-            title: trip.title,
-            country: trip.country,
-            city: trip.city,
-            startDate: trip.startDate,
-            endDate: trip.endDate,
-            budget: trip.budget,
-        }));
+        const totalPages = Math.ceil(totalTrips / dto.limit);
+
+        const mappedTrips = data.map((trip) => {
+            return {
+                id: trip.id,
+                title: trip.title,
+                country: trip.country,
+                city: trip.city,
+                startDate: trip.startDate,
+                endDate: trip.endDate,
+                budget: trip.budget,
+            };
+        });
+
+        return {
+            data: mappedTrips,
+            meta: {
+                totalItems: totalTrips,
+                totalPages,
+                currentPage: dto.page,
+                pageSize: dto.limit,
+            },
+        };
     },
 
     async getById(tripId: number, userId: number): Promise<TripResponse> {

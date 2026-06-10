@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "../db/db";
 import { tripsTable } from "../db/schema";
 import { CreateTripDao, Trip, UpdateTripDao } from "../types/trip";
@@ -10,12 +10,37 @@ export const tripsRepository = {
         return trip;
     },
 
-    async findAllByUserId(id: number): Promise<Trip[]> {
-        return await db
+    async findManyByUserId(
+        id: number,
+        page: number,
+        limit: number,
+    ): Promise<{ data: Trip[]; totalTrips: number }> {
+        const offset = (page - 1) * limit;
+
+        const dataPromise = db
             .select()
             .from(tripsTable)
             .where(eq(tripsTable.userId, id))
-            .orderBy(desc(tripsTable.createdAt));
+            .orderBy(desc(tripsTable.createdAt))
+            .limit(limit)
+            .offset(offset);
+
+        const countPromise = db
+            .select({ totalTrips: count() })
+            .from(tripsTable)
+            .where(eq(tripsTable.userId, id));
+
+        const [data, countResult] = await Promise.all([
+            dataPromise,
+            countPromise,
+        ]);
+
+        const totalTrips = countResult[0].totalTrips ?? 0;
+
+        return {
+            data,
+            totalTrips,
+        };
     },
 
     async findById(id: number): Promise<Trip | undefined> {

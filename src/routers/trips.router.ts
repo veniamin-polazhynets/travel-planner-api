@@ -4,6 +4,11 @@ import { validateBody } from "../middlewares/body-validation.middleware";
 import { createTripSchema } from "../validation/trips/create-trip.schema";
 import { tripsService } from "../services/trips.service";
 import { updateTripSchema } from "../validation/trips/update-trip.schema";
+import { validateQuery } from "../middlewares/query-validation.middleware";
+import {
+    QueryTripsDto,
+    queryTripsSchema,
+} from "../validation/trips/query-trips.schema";
 
 export const tripsRouter = express.Router();
 
@@ -25,9 +30,12 @@ tripsRouter.post(
 tripsRouter.get(
     "/",
     authMiddleware,
+    validateQuery(queryTripsSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await tripsService.getAll(req.user!.id);
+            const queryData = res.locals.queryData as QueryTripsDto;
+
+            const result = await tripsService.getMany(req.user!.id, queryData);
 
             res.status(200).json(result);
         } catch (error) {

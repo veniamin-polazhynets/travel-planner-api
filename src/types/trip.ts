@@ -23,3 +23,13 @@ export type Trip = {
 export type TripResponse = Omit<Trip, "userId" | "createdAt" | "updatedAt">;
 
 export type UpdateTripDao = Partial<Omit<CreateTripDao, "userId">>;
+
+export type TripArrayResponse = {
+    data: TripResponse[];
+    meta: {
+        totalItems: number;
+        totalPages: number;
+        currentPage: number;
+        pageSize: number;
+    };
+};
