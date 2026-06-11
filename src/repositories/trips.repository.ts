@@ -55,7 +55,7 @@ export const tripsRepository = {
     async update(id: number, dao: UpdateTripDao): Promise<Trip | undefined> {
         const [trip] = await db
             .update(tripsTable)
-            .set(dao)
+            .set({ ...dao, updatedAt: new Date() })
             .where(eq(tripsTable.id, id))
             .returning();
 
