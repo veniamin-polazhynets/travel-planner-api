@@ -9,6 +9,8 @@ import {
     QueryTripsDto,
     queryTripsSchema,
 } from "../validation/trips/query-trips.schema";
+import { validateParams } from "../middlewares/params-validation.middleware";
+import { TripIdDto, tripIdSchema } from "../validation/trips/trip-id.schema";
 
 export const tripsRouter = express.Router();
 
@@ -47,12 +49,12 @@ tripsRouter.get(
 tripsRouter.get(
     "/:id",
     authMiddleware,
+    validateParams(tripIdSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await tripsService.getById(
-                +req.params.id,
-                req.user!.id,
-            );
+            const params = req.params as unknown as TripIdDto;
+
+            const result = await tripsService.getById(params.id, req.user!.id);
 
             res.status(200).json(result);
         } catch (error) {
@@ -64,11 +66,14 @@ tripsRouter.get(
 tripsRouter.patch(
     "/:id",
     authMiddleware,
+    validateParams(tripIdSchema),
     validateBody(updateTripSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const params = req.params as unknown as TripIdDto;
+
             const result = await tripsService.update(
-                +req.params.id,
+                params.id,
                 req.user!.id,
                 req.body,
             );
@@ -83,9 +88,12 @@ tripsRouter.patch(
 tripsRouter.delete(
     "/:id",
     authMiddleware,
+    validateParams(tripIdSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await tripsService.delete(+req.params.id, req.user!.id);
+            const params = req.params as unknown as TripIdDto;
+
+            await tripsService.delete(params.id, req.user!.id);
 
             res.sendStatus(204);
         } catch (error) {
