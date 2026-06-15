@@ -1,7 +1,12 @@
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, ilike } from "drizzle-orm";
 import { db } from "../db/db";
 import { tripsTable } from "../db/schema";
-import { CreateTripDao, Trip, UpdateTripDao } from "../types/trip";
+import {
+    CreateTripDao,
+    QueryTripsDao,
+    Trip,
+    UpdateTripDao,
+} from "../types/trip";
 
 export const tripsRepository = {
     async create(dao: CreateTripDao): Promise<Trip> {
@@ -12,15 +17,30 @@ export const tripsRepository = {
 
     async findManyByUserId(
         id: number,
-        page: number,
-        limit: number,
+        dao: QueryTripsDao,
     ): Promise<{ data: Trip[]; totalTrips: number }> {
+        const { page, limit, search, country, city } = dao;
+
         const offset = (page - 1) * limit;
+
+        const whereConditions = [eq(tripsTable.userId, id)];
+
+        if (search) {
+            whereConditions.push(ilike(tripsTable.title, `%${search}%`));
+        }
+
+        if (country) {
+            whereConditions.push(eq(tripsTable.country, country));
+        }
+
+        if (city) {
+            whereConditions.push(eq(tripsTable.city, city));
+        }
 
         const dataPromise = db
             .select()
             .from(tripsTable)
-            .where(eq(tripsTable.userId, id))
+            .where(and(...whereConditions))
             .orderBy(desc(tripsTable.createdAt))
             .limit(limit)
             .offset(offset);
@@ -28,7 +48,7 @@ export const tripsRepository = {
         const countPromise = db
             .select({ totalTrips: count() })
             .from(tripsTable)
-            .where(eq(tripsTable.userId, id));
+            .where(and(...whereConditions));
 
         const [data, countResult] = await Promise.all([
             dataPromise,

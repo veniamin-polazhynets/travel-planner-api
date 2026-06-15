@@ -28,8 +28,7 @@ export const tripsService = {
     ): Promise<TripArrayResponse> {
         const { data, totalTrips } = await tripsRepository.findManyByUserId(
             userId,
-            dto.page,
-            dto.limit,
+            dto,
         );
 
         const totalPages = Math.ceil(totalTrips / dto.limit);

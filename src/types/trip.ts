@@ -33,3 +33,11 @@ export type TripArrayResponse = {
         pageSize: number;
     };
 };
+
+export type QueryTripsDao = {
+    page: number;
+    limit: number;
+    search?: string;
+    country?: string;
+    city?: string;
+};
