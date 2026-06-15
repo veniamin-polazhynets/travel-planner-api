@@ -15,6 +15,13 @@
       "when": 1780474613552,
       "tag": "0001_fix-users-table-and-add-trips-table",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781503885598,
+      "tag": "0002_add-timezone",
+      "breakpoints": true
     }
   ]
 }

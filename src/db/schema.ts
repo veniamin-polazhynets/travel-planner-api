@@ -26,6 +26,10 @@ export const tripsTable = pgTable("trips", {
     startDate: date("start_date").notNull(),
     endDate: date("end_date").notNull(),
     budget: numeric("budget", { precision: 12, scale: 2 }).notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+        .defaultNow()
+        .notNull(),
 });
