@@ -6,6 +6,10 @@ export const queryTripsSchema = z.object({
     search: z.string().trim().min(1).max(100).optional(),
     country: z.string().trim().min(1).max(100).optional(),
     city: z.string().trim().min(1).max(100).optional(),
+    sortBy: z
+        .enum(["startDate", "endDate", "budget", "createdAt"])
+        .default("createdAt"),
+    order: z.enum(["asc", "desc"]).default("desc"),
 });
 
 export type QueryTripsDto = z.infer<typeof queryTripsSchema>;

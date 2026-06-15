@@ -40,4 +40,6 @@ export type QueryTripsDao = {
     search?: string;
     country?: string;
     city?: string;
+    sortBy: "startDate" | "endDate" | "budget" | "createdAt";
+    order: "asc" | "desc";
 };
