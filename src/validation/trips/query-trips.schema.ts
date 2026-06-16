@@ -1,15 +1,20 @@
 import z from "zod";
+import { baseQueryTripsSchema } from "./base-query-trips.schema";
 
-export const queryTripsSchema = z.object({
-    page: z.coerce.number().int().min(1).default(1),
-    limit: z.coerce.number().int().min(2).max(20).default(10),
-    search: z.string().trim().min(1).max(100).optional(),
-    country: z.string().trim().min(1).max(100).optional(),
-    city: z.string().trim().min(1).max(100).optional(),
-    sortBy: z
-        .enum(["startDate", "endDate", "budget", "createdAt"])
-        .default("createdAt"),
-    order: z.enum(["asc", "desc"]).default("desc"),
-});
+export const queryTripsSchema = baseQueryTripsSchema.refine(
+    (data) => {
+        if (data.from && data.to) {
+            const fromDate = new Date(data.from);
+            const toDate = new Date(data.to);
+            return toDate >= fromDate;
+        }
+
+        return true;
+    },
+    {
+        message: `Parameter "to" must be greater than or equal to parameter "from"`,
+        path: ["to"],
+    },
+);
 
 export type QueryTripsDto = z.infer<typeof queryTripsSchema>;

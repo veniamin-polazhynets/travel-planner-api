@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, ilike } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, ilike, lte } from "drizzle-orm";
 import { db } from "../db/db";
 import { tripsTable } from "../db/schema";
 import {
@@ -19,7 +19,8 @@ export const tripsRepository = {
         id: number,
         dao: QueryTripsDao,
     ): Promise<{ data: Trip[]; totalTrips: number }> {
-        const { page, limit, search, country, city, sortBy, order } = dao;
+        const { page, limit, search, country, city, sortBy, order, from, to } =
+            dao;
 
         const offset = (page - 1) * limit;
 
@@ -35,6 +36,14 @@ export const tripsRepository = {
 
         if (city) {
             whereConditions.push(eq(tripsTable.city, city));
+        }
+
+        if (from) {
+            whereConditions.push(gte(tripsTable.startDate, from));
+        }
+
+        if (to) {
+            whereConditions.push(lte(tripsTable.startDate, to));
         }
 
         const orderByColumns = {
