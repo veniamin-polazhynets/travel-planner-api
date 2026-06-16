@@ -1,3 +1,4 @@
+import { pgEnum } from "drizzle-orm/pg-core";
 import {
     date,
     integer,
@@ -26,6 +27,32 @@ export const tripsTable = pgTable("trips", {
     startDate: date("start_date").notNull(),
     endDate: date("end_date").notNull(),
     budget: numeric("budget", { precision: 12, scale: 2 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+        .defaultNow()
+        .notNull(),
+});
+
+export const expenseCategoryEnum = pgEnum("category", [
+    "accommodation",
+    "transport",
+    "food",
+    "entertainment",
+    "shopping",
+    "services",
+    "other",
+]);
+
+export const expensesTable = pgTable("expenses", {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    tripId: integer("trip_id")
+        .references(() => tripsTable.id, { onDelete: "cascade" })
+        .notNull(),
+    title: varchar("title", { length: 100 }).notNull(),
+    category: expenseCategoryEnum().notNull().default("other"),
+    amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
         .defaultNow()
         .notNull(),
