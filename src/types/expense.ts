@@ -28,3 +28,5 @@ export type Expense = {
     createdAt: Date;
     updatedAt: Date;
 };
+
+export type ExpenseResponse = Omit<Expense, "createdAt" | "updatedAt">;

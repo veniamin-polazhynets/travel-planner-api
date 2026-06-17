@@ -11,6 +11,7 @@ import {
 } from "../validation/trips/query-trips.schema";
 import { validateParams } from "../middlewares/params-validation.middleware";
 import { TripIdDto, tripIdSchema } from "../validation/trips/trip-id.schema";
+import { expensesRouter } from "./expenses.router";
 
 export const tripsRouter = express.Router();
 
@@ -101,3 +102,5 @@ tripsRouter.delete(
         }
     },
 );
+
+tripsRouter.use("/:tripId/expenses", expensesRouter);
