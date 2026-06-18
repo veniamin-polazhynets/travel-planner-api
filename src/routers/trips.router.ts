@@ -10,8 +10,9 @@ import {
     queryTripsSchema,
 } from "../validation/trips/query-trips.schema";
 import { validateParams } from "../middlewares/params-validation.middleware";
-import { TripIdDto, tripIdSchema } from "../validation/trips/trip-id.schema";
+
 import { expensesRouter } from "./expenses.router";
+import { createIdParamSchema } from "../validation/common/id.schema";
 
 export const tripsRouter = express.Router();
 
@@ -48,14 +49,14 @@ tripsRouter.get(
 );
 
 tripsRouter.get(
-    "/:id",
+    "/:tripId",
     authMiddleware,
-    validateParams(tripIdSchema),
+    validateParams(createIdParamSchema("tripId")),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const params = req.params as unknown as TripIdDto;
+            const tripId = Number(req.params.tripId);
 
-            const result = await tripsService.getById(params.id, req.user!.id);
+            const result = await tripsService.getById(tripId, req.user!.id);
 
             res.status(200).json(result);
         } catch (error) {
@@ -65,16 +66,16 @@ tripsRouter.get(
 );
 
 tripsRouter.patch(
-    "/:id",
+    "/:tripId",
     authMiddleware,
-    validateParams(tripIdSchema),
+    validateParams(createIdParamSchema("tripId")),
     validateBody(updateTripSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const params = req.params as unknown as TripIdDto;
+            const tripId = Number(req.params.tripId);
 
             const result = await tripsService.update(
-                params.id,
+                tripId,
                 req.user!.id,
                 req.body,
             );
@@ -87,14 +88,14 @@ tripsRouter.patch(
 );
 
 tripsRouter.delete(
-    "/:id",
+    "/:tripId",
     authMiddleware,
-    validateParams(tripIdSchema),
+    validateParams(createIdParamSchema("tripId")),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const params = req.params as unknown as TripIdDto;
+            const tripId = Number(req.params.tripId);
 
-            await tripsService.delete(params.id, req.user!.id);
+            await tripsService.delete(tripId, req.user!.id);
 
             res.sendStatus(204);
         } catch (error) {
