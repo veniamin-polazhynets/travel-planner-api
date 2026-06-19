@@ -16,8 +16,8 @@ expensesRouter.post(
     validateParams(createIdParamSchema("tripId")),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tripId = Number(req.params.tripId);
             const userId = req.user!.id;
+            const tripId = Number(req.params.tripId);
             const expense = await expensesService.create(
                 userId,
                 tripId,
@@ -25,6 +25,47 @@ expensesRouter.post(
             );
 
             res.status(201).json(expense);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+expensesRouter.get(
+    "/",
+    authMiddleware,
+    validateParams(createIdParamSchema("tripId")),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user!.id;
+            const tripId = Number(req.params.tripId);
+            const result = await expensesService.getAllByTripId(userId, tripId);
+
+            res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+expensesRouter.get(
+    "/:expenseId",
+    authMiddleware,
+    validateParams(
+        createIdParamSchema("tripId").merge(createIdParamSchema("expenseId")),
+    ),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user!.id;
+            const tripId = Number(req.params.tripId);
+            const expenseId = Number(req.params.expenseId);
+            const expense = await expensesService.getById(
+                userId,
+                tripId,
+                expenseId,
+            );
+
+            res.status(200).json(expense);
         } catch (error) {
             next(error);
         }
