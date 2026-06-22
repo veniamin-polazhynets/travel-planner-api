@@ -98,3 +98,27 @@ expensesRouter.patch(
         }
     },
 );
+
+expensesRouter.delete(
+    "/:expenseId",
+    authMiddleware,
+    validateParams(
+        createIdParamSchema("tripId").merge(createIdParamSchema("expenseId")),
+    ),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user!.id;
+            const tripId = Number(req.params.tripId);
+            const expenseId = Number(req.params.expenseId);
+            const result = await expensesService.delete(
+                userId,
+                tripId,
+                expenseId,
+            );
+
+            res.sendStatus(204);
+        } catch (error) {
+            next(error);
+        }
+    },
+);

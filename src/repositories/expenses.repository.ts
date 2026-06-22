@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../db/db";
 import { expensesTable } from "../db/schema";
 import { CreateExpenseDao, Expense, UpdateExpenseDao } from "../types/expense";
@@ -42,5 +42,22 @@ export const expensesRepository = {
             .returning();
 
         return expense || undefined;
+    },
+
+    async delete(
+        expenseId: number,
+        tripId: number,
+    ): Promise<Expense | undefined> {
+        const [deletedExpense] = await db
+            .delete(expensesTable)
+            .where(
+                and(
+                    eq(expensesTable.id, expenseId),
+                    eq(expensesTable.tripId, tripId),
+                ),
+            )
+            .returning();
+
+        return deletedExpense || undefined;
     },
 };

@@ -155,4 +155,31 @@ export const expensesService = {
             amount: updatedExpense.amount,
         };
     },
+
+    async delete(
+        userId: number,
+        tripId: number,
+        expenseId: number,
+    ): Promise<void> {
+        const trip = await tripsRepository.findById(tripId);
+
+        if (!trip) {
+            throw new NotFoundError("Trip not found");
+        }
+
+        if (trip.userId !== userId) {
+            throw new ForbiddenError(
+                "You don't have access to this trip expense",
+            );
+        }
+
+        const deletedExpense = await expensesRepository.delete(
+            expenseId,
+            tripId,
+        );
+
+        if (!deletedExpense) {
+            throw new NotFoundError("Expense not found");
+        }
+    },
 };
