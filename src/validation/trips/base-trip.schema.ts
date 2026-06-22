@@ -8,3 +8,12 @@ export const baseTripSchema = z.object({
     endDate: z.string().trim().date(),
     budget: z.number().positive(),
 });
+
+export const validateDates = (startDate?: string, endDate?: string) => {
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return end >= start;
+    }
+    return true;
+};

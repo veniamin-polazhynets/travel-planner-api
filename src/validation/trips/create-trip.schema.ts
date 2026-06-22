@@ -1,12 +1,8 @@
 import { z } from "zod";
-import { baseTripSchema } from "./base-trip.schema";
+import { baseTripSchema, validateDates } from "./base-trip.schema";
 
 export const createTripSchema = baseTripSchema.refine(
-    (data) => {
-        const start = new Date(data.startDate);
-        const end = new Date(data.endDate);
-        return end >= start;
-    },
+    (data) => validateDates(data.startDate, data.endDate),
     {
         message: "End date must be greater than or equal to start date",
         path: ["endDate"],

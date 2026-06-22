@@ -1,10 +1,9 @@
 import z from "zod";
 import { baseExpenseSchema } from "./base-expense.schema";
+import { withNonEmptyBody } from "../common/with-non-empty-body";
 
-export const updateExpenseSchema = baseExpenseSchema
-    .partial()
-    .refine((data) => Object.keys(data).length > 0, {
-        message: "Body must contain at least one field to update",
-    });
+export const updateExpenseSchema = withNonEmptyBody(
+    baseExpenseSchema.partial(),
+);
 
 export type UpdateExpenseDto = z.infer<typeof updateExpenseSchema>;
