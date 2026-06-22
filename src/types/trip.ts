@@ -1,13 +1,3 @@
-export type CreateTripDao = {
-    userId: number;
-    title: string;
-    country: string;
-    city: string;
-    startDate: string;
-    endDate: string;
-    budget: string;
-};
-
 export type Trip = {
     id: number;
     userId: number;
@@ -20,9 +10,20 @@ export type Trip = {
     createdAt: Date;
     updatedAt: Date;
 };
-export type TripResponse = Omit<Trip, "userId" | "createdAt" | "updatedAt">;
+
+export type CreateTripDao = {
+    userId: number;
+    title: string;
+    country: string;
+    city: string;
+    startDate: string;
+    endDate: string;
+    budget: string;
+};
 
 export type UpdateTripDao = Partial<Omit<CreateTripDao, "userId">>;
+
+export type TripResponse = Omit<Trip, "userId" | "createdAt" | "updatedAt">;
 
 export type TripArrayResponse = {
     data: TripResponse[];
