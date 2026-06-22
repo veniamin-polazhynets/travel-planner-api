@@ -6,6 +6,7 @@ import { validateBody } from "../middlewares/body-validation.middleware";
 import { createExpenseSchema } from "../validation/expenses/create-expense.schema";
 import { expensesService } from "../services/expenses.service";
 import { createIdParamSchema } from "../validation/common/id.schema";
+import { updateExpenseSchema } from "../validation/expenses/update-expense.schema";
 
 export const expensesRouter = express.Router({ mergeParams: true });
 
@@ -66,6 +67,32 @@ expensesRouter.get(
             );
 
             res.status(200).json(expense);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+expensesRouter.patch(
+    "/:expenseId",
+    authMiddleware,
+    validateParams(
+        createIdParamSchema("tripId").merge(createIdParamSchema("expenseId")),
+    ),
+    validateBody(updateExpenseSchema),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user!.id;
+            const tripId = Number(req.params.tripId);
+            const expenseId = Number(req.params.expenseId);
+            const result = await expensesService.update(
+                userId,
+                tripId,
+                expenseId,
+                req.body,
+            );
+
+            res.status(200).json(result);
         } catch (error) {
             next(error);
         }

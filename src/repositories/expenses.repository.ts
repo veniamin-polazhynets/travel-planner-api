@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/db";
 import { expensesTable } from "../db/schema";
-import { CreateExpenseDao, Expense } from "../types/expense";
+import { CreateExpenseDao, Expense, UpdateExpenseDao } from "../types/expense";
 
 export const expensesRepository = {
     async create(dao: CreateExpenseDao): Promise<Expense> {
@@ -27,6 +27,19 @@ export const expensesRepository = {
             .select()
             .from(expensesTable)
             .where(eq(expensesTable.id, id));
+
+        return expense || undefined;
+    },
+
+    async update(
+        id: number,
+        dao: UpdateExpenseDao,
+    ): Promise<Expense | undefined> {
+        const [expense] = await db
+            .update(expensesTable)
+            .set({ ...dao, updatedAt: new Date() })
+            .where(eq(expensesTable.id, id))
+            .returning();
 
         return expense || undefined;
     },

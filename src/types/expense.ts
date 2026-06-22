@@ -30,3 +30,5 @@ export type Expense = {
 };
 
 export type ExpenseResponse = Omit<Expense, "createdAt" | "updatedAt">;
+
+export type UpdateExpenseDao = Partial<Omit<CreateExpenseDao, "tripId">>;

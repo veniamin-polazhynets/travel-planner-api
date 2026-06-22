@@ -3,6 +3,7 @@ import { expensesRepository } from "../repositories/expenses.repository";
 import { tripsRepository } from "../repositories/trips.repository";
 import { ExpenseResponse } from "../types/expense";
 import { CreateExpenseDto } from "../validation/expenses/create-expense.schema";
+import { UpdateExpenseDto } from "../validation/expenses/update-expense.schema";
 
 export const expensesService = {
     async create(
@@ -97,6 +98,61 @@ export const expensesService = {
             title: expense.title,
             category: expense.category,
             amount: expense.amount,
+        };
+    },
+
+    async update(
+        userId: number,
+        tripId: number,
+        expenseId: number,
+        dto: UpdateExpenseDto,
+    ): Promise<ExpenseResponse> {
+        const trip = await tripsRepository.findById(tripId);
+
+        if (!trip) {
+            throw new NotFoundError("Trip not found");
+        }
+
+        if (trip.userId !== userId) {
+            throw new ForbiddenError(
+                "You don't have access to this trip expense",
+            );
+        }
+
+        const expense = await expensesRepository.findById(expenseId);
+
+        if (!expense) {
+            throw new NotFoundError("Expense not found");
+        }
+
+        if (expense.tripId !== tripId) {
+            throw new ForbiddenError(
+                "You don't have access to this trip expense",
+            );
+        }
+
+        const { amount, ...restDto } = dto;
+
+        const expenseData = {
+            ...restDto,
+            ...(amount !== undefined ? { amount: amount.toFixed(2) } : {}),
+        };
+
+        const updatedExpense = await expensesRepository.update(
+            expenseId,
+            expenseData,
+        );
+
+        if (!updatedExpense) {
+            throw new NotFoundError("Expense not found during update");
+        }
+
+        return {
+            id: updatedExpense.id,
+            tripId: updatedExpense.tripId,
+            title: updatedExpense.title,
+            category: updatedExpense.category,
+            amount: updatedExpense.amount,
         };
     },
 };
