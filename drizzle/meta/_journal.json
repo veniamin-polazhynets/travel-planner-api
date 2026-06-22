@@ -29,6 +29,13 @@
       "when": 1781593559298,
       "tag": "0003_create-expenses-table",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782124821031,
+      "tag": "0004_add-timestamps-to-users-table",
+      "breakpoints": true
     }
   ]
 }

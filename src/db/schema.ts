@@ -14,6 +14,12 @@ export const usersTable = pgTable("users", {
     email: varchar("email", { length: 255 }).notNull().unique(),
     passwordHash: varchar("password_hash", { length: 60 }).notNull(),
     tokenVersion: integer("token_version").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+        .defaultNow()
+        .notNull(),
 });
 
 export const tripsTable = pgTable("trips", {

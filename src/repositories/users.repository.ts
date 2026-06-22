@@ -49,7 +49,7 @@ export const usersRepository = {
     async update(id: number, dao: UpdateUserDao): Promise<User> {
         const [user] = await db
             .update(usersTable)
-            .set(dao)
+            .set({ ...dao, updatedAt: new Date() })
             .where(eq(usersTable.id, id))
             .returning();
 
