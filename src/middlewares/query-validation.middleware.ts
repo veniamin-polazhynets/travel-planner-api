@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodObject } from "zod";
+import { ZodType } from "zod";
 
 export const validateQuery =
-    (schema: ZodObject<any>) =>
+    <T extends ZodType>(schema: T) =>
     (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req.query);
 
@@ -10,7 +10,7 @@ export const validateQuery =
             return next(result.error);
         }
 
-        res.locals.queryData = result.data;
+        req.query = result.data as any;
 
         next();
     };
