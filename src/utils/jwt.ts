@@ -1,6 +1,7 @@
 import jsonwebtoken from "jsonwebtoken";
 import { JWTPayload } from "../types/jwt";
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../config/config";
+import { UnauthorizedError } from "../errors/http.errors";
 
 export const jwtHelper = {
     createRefreshToken(payload: JWTPayload) {
@@ -16,10 +17,11 @@ export const jwtHelper = {
     },
 
     verifyRefreshToken(refreshToken: string): JWTPayload {
-        const decoded = jsonwebtoken.verify(
-            refreshToken,
-            REFRESH_TOKEN_SECRET,
-        ) as jsonwebtoken.JwtPayload;
+        const decoded = jsonwebtoken.verify(refreshToken, REFRESH_TOKEN_SECRET);
+
+        if (!decoded || typeof decoded === "string" || !decoded.userId) {
+            throw new UnauthorizedError("Invalid token payload");
+        }
 
         return {
             userId: decoded.userId,
@@ -28,10 +30,11 @@ export const jwtHelper = {
     },
 
     verifyAccessToken(accessToken: string): JWTPayload {
-        const decoded = jsonwebtoken.verify(
-            accessToken,
-            ACCESS_TOKEN_SECRET,
-        ) as jsonwebtoken.JwtPayload;
+        const decoded = jsonwebtoken.verify(accessToken, ACCESS_TOKEN_SECRET);
+
+        if (!decoded || typeof decoded === "string" || !decoded.userId) {
+            throw new UnauthorizedError("Invalid token payload");
+        }
 
         return {
             userId: decoded.userId,
