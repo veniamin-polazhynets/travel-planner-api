@@ -1,25 +1,36 @@
 import dotenv from "dotenv";
+import { z } from "zod";
 
 dotenv.config();
 
-export const NODE_ENV = process.env.NODE_ENV || "development";
+const envSchema = z.object({
+    NODE_ENV: z
+        .enum(["development", "production", "test"])
+        .default("development"),
+    PORT: z.coerce.number().default(8000),
+    DATABASE_URL: z.string({ error: "DATABASE_URL is missing" }),
+    ACCESS_TOKEN_SECRET: z.string({
+        error: "ACCESS_TOKEN_SECRET is missing",
+    }),
+    REFRESH_TOKEN_SECRET: z.string({
+        error: "REFRESH_TOKEN_SECRET is missing",
+    }),
+});
 
-export const PORT: number = Number(process.env.PORT) || 8000;
+const envParse = envSchema.safeParse(process.env);
 
-if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is missing");
+if (!envParse.success) {
+    console.error(
+        "Invalid environment configuration:",
+        z.prettifyError(envParse.error),
+    );
+    throw new Error("Fix your .env file before running the server");
 }
 
-export const DATABASE_URL = process.env.DATABASE_URL;
-
-if (!process.env.ACCESS_TOKEN_SECRET) {
-    throw new Error("ACCESS_TOKEN_SECRET is missing");
-}
-
-export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-
-if (!process.env.REFRESH_TOKEN_SECRET) {
-    throw new Error("REFRESH_TOKEN_SECRET is missing");
-}
-
-export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
+export const {
+    NODE_ENV,
+    PORT,
+    DATABASE_URL,
+    ACCESS_TOKEN_SECRET,
+    REFRESH_TOKEN_SECRET,
+} = envParse.data;
