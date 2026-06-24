@@ -8,9 +8,25 @@ import {
     UpdateTripDao,
 } from "../types/trip";
 
+const defaultTripFields = {
+    id: tripsTable.id,
+    userId: tripsTable.userId,
+    title: tripsTable.title,
+    country: tripsTable.country,
+    city: tripsTable.city,
+    startDate: tripsTable.startDate,
+    endDate: tripsTable.endDate,
+    budget: tripsTable.budget,
+    createdAt: tripsTable.createdAt,
+    updatedAt: tripsTable.updatedAt,
+};
+
 export const tripsRepository = {
     async create(dao: CreateTripDao): Promise<Trip> {
-        const [trip] = await db.insert(tripsTable).values(dao).returning();
+        const [trip] = await db
+            .insert(tripsTable)
+            .values(dao)
+            .returning(defaultTripFields);
 
         return trip;
     },
@@ -26,25 +42,16 @@ export const tripsRepository = {
 
         const whereConditions = [eq(tripsTable.userId, id)];
 
-        if (search) {
+        if (search)
             whereConditions.push(ilike(tripsTable.title, `%${search}%`));
-        }
 
-        if (country) {
-            whereConditions.push(eq(tripsTable.country, country));
-        }
+        if (country) whereConditions.push(eq(tripsTable.country, country));
 
-        if (city) {
-            whereConditions.push(eq(tripsTable.city, city));
-        }
+        if (city) whereConditions.push(eq(tripsTable.city, city));
 
-        if (from) {
-            whereConditions.push(gte(tripsTable.startDate, from));
-        }
+        if (from) whereConditions.push(gte(tripsTable.startDate, from));
 
-        if (to) {
-            whereConditions.push(lte(tripsTable.startDate, to));
-        }
+        if (to) whereConditions.push(lte(tripsTable.startDate, to));
 
         const orderByColumns = {
             startDate: tripsTable.startDate,
@@ -59,7 +66,7 @@ export const tripsRepository = {
         const orderByClause = sortFunction(orderByRow);
 
         const dataPromise = db
-            .select()
+            .select(defaultTripFields)
             .from(tripsTable)
             .where(and(...whereConditions))
             .orderBy(orderByClause)
@@ -86,11 +93,11 @@ export const tripsRepository = {
 
     async findById(id: number): Promise<Trip | undefined> {
         const [trip] = await db
-            .select()
+            .select(defaultTripFields)
             .from(tripsTable)
             .where(eq(tripsTable.id, id));
 
-        return trip || undefined;
+        return trip;
     },
 
     async update(id: number, dao: UpdateTripDao): Promise<Trip | undefined> {
@@ -98,9 +105,9 @@ export const tripsRepository = {
             .update(tripsTable)
             .set({ ...dao, updatedAt: new Date() })
             .where(eq(tripsTable.id, id))
-            .returning();
+            .returning(defaultTripFields);
 
-        return trip || undefined;
+        return trip;
     },
 
     async delete(tripId: number, userId: number): Promise<Trip | undefined> {
@@ -109,8 +116,8 @@ export const tripsRepository = {
             .where(
                 and(eq(tripsTable.id, tripId), eq(tripsTable.userId, userId)),
             )
-            .returning();
+            .returning(defaultTripFields);
 
-        return deletedTrip || undefined;
+        return deletedTrip;
     },
 };

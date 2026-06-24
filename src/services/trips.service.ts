@@ -1,6 +1,7 @@
 import { ForbiddenError, NotFoundError } from "../errors/http.errors";
 import { tripsRepository } from "../repositories/trips.repository";
-import { CreateTripDao, TripArrayResponse, TripResponse } from "../types/trip";
+import { TripArrayResponse, TripResponse, UpdateTripDao } from "../types/trip";
+import { mapToTripResponse } from "../utils/mappers/trip-mapper";
 import { CreateTripDto } from "../validation/trips/create-trip.schema";
 import { QueryTripsDto } from "../validation/trips/query-trips.schema";
 import { UpdateTripDto } from "../validation/trips/update-trip.schema";
@@ -11,15 +12,7 @@ export const tripsService = {
 
         const trip = await tripsRepository.create(tripData);
 
-        return {
-            id: trip.id,
-            title: trip.title,
-            country: trip.country,
-            city: trip.city,
-            startDate: trip.startDate,
-            endDate: trip.endDate,
-            budget: trip.budget,
-        };
+        return mapToTripResponse(trip);
     },
 
     async getMany(
@@ -33,17 +26,7 @@ export const tripsService = {
 
         const totalPages = Math.ceil(totalTrips / dto.limit);
 
-        const mappedTrips = data.map((trip) => {
-            return {
-                id: trip.id,
-                title: trip.title,
-                country: trip.country,
-                city: trip.city,
-                startDate: trip.startDate,
-                endDate: trip.endDate,
-                budget: trip.budget,
-            };
-        });
+        const mappedTrips = data.map(mapToTripResponse);
 
         return {
             data: mappedTrips,
@@ -64,18 +47,10 @@ export const tripsService = {
         }
 
         if (trip.userId !== userId) {
-            throw new ForbiddenError("You can't read this trip");
+            throw new ForbiddenError("Access denied for this trip");
         }
 
-        return {
-            id: trip.id,
-            title: trip.title,
-            country: trip.country,
-            city: trip.city,
-            startDate: trip.startDate,
-            endDate: trip.endDate,
-            budget: trip.budget,
-        };
+        return mapToTripResponse(trip);
     },
 
     async update(
@@ -90,12 +65,12 @@ export const tripsService = {
         }
 
         if (trip.userId !== userId) {
-            throw new ForbiddenError("You can't edit this trip");
+            throw new ForbiddenError("Access denied for this trip");
         }
 
         const { budget, ...restDto } = dto;
 
-        const tripData: Partial<Omit<CreateTripDao, "userId">> = {
+        const tripData = {
             ...restDto,
             ...(budget !== undefined ? { budget: budget.toFixed(2) } : {}),
         };
@@ -106,15 +81,7 @@ export const tripsService = {
             throw new NotFoundError("Trip not found during update");
         }
 
-        return {
-            id: updatedTrip.id,
-            title: updatedTrip.title,
-            country: updatedTrip.country,
-            city: updatedTrip.city,
-            startDate: updatedTrip.startDate,
-            endDate: updatedTrip.endDate,
-            budget: updatedTrip.budget,
-        };
+        return mapToTripResponse(updatedTrip);
     },
 
     async delete(tripId: number, userId: number): Promise<void> {
