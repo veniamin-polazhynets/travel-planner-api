@@ -1,5 +1,4 @@
 import {
-    BadRequestError,
     ConflictError,
     NotFoundError,
     UnauthorizedError,
@@ -7,6 +6,7 @@ import {
 import { usersRepository } from "../repositories/users.repository";
 import { UserResponse } from "../types/user";
 import { bcryptHelper } from "../utils/hash";
+import { mapToUserResponse } from "../utils/mappers/user-mapper";
 import { DeleteUserDto } from "../validation/users/delete-user.schema";
 import { UpdateUserDto } from "../validation/users/update-user.schema";
 
@@ -18,18 +18,10 @@ export const usersService = {
             throw new NotFoundError("User not found");
         }
 
-        return {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-        };
+        return mapToUserResponse(user);
     },
 
     async updateProfile(id: number, dto: UpdateUserDto): Promise<UserResponse> {
-        if (dto.username === undefined && dto.email === undefined) {
-            throw new BadRequestError("Nothing to update");
-        }
-
         if (dto.email) {
             const existing = await usersRepository.findByEmail(dto.email);
             if (existing && existing.id !== id) {
@@ -46,11 +38,7 @@ export const usersService = {
 
         const updatedUser = await usersRepository.update(id, dto);
 
-        return {
-            id: updatedUser.id,
-            username: updatedUser.username,
-            email: updatedUser.email,
-        };
+        return mapToUserResponse(updatedUser);
     },
 
     async deleteAccount(id: number, dto: DeleteUserDto): Promise<void> {
@@ -69,6 +57,10 @@ export const usersService = {
             throw new UnauthorizedError("Invalid password");
         }
 
-        return await usersRepository.delete(id);
+        const deletedUser = await usersRepository.delete(id);
+
+        if (!deletedUser) {
+            throw new NotFoundError("User not found during delete");
+        }
     },
 };

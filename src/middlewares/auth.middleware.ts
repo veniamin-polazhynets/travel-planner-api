@@ -35,7 +35,7 @@ export const authMiddleware = async (
             return next(new UnauthorizedError("Invalid or expired token"));
         }
 
-        const user = await usersRepository.findById(payload.userId);
+        const user = await usersRepository.findById(payload.id);
 
         if (!user) {
             return next(new UnauthorizedError("User no longer exists"));

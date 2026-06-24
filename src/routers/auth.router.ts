@@ -69,9 +69,7 @@ authRouter.post(
 
             const result = await authService.refresh(refreshToken);
 
-            res.status(200).json({
-                accessToken: result.accessToken,
-            });
+            res.status(200).json(result);
         } catch (error) {
             next(error);
         }

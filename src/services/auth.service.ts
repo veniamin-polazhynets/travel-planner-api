@@ -1,11 +1,12 @@
 import { ConflictError, UnauthorizedError } from "../errors/http.errors";
 import { usersRepository } from "../repositories/users.repository";
-import { AuthResponse, UserResponse } from "../types/user";
+import { AuthResponse } from "../types/user";
 import { bcryptHelper } from "../utils/hash";
 import { RegistrationDto } from "../validation/users/registration.schema";
 import { jwtHelper } from "../utils/jwt";
 import { JWTPayload } from "../types/jwt";
 import { LoginDto } from "../validation/users/login.schema";
+import { mapToUserResponse } from "../utils/mappers/user-mapper";
 
 export const authService = {
     async register(dto: RegistrationDto): Promise<AuthResponse> {
@@ -32,7 +33,7 @@ export const authService = {
         });
 
         const payload: JWTPayload = {
-            userId: user.id,
+            id: user.id,
             tokenVersion: user.tokenVersion,
         };
 
@@ -40,11 +41,7 @@ export const authService = {
 
         const accessToken = jwtHelper.createAccessToken(payload);
 
-        const userResponse: UserResponse = {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-        };
+        const userResponse = mapToUserResponse(user);
 
         return {
             user: userResponse,
@@ -70,7 +67,7 @@ export const authService = {
         }
 
         const payload: JWTPayload = {
-            userId: user.id,
+            id: user.id,
             tokenVersion: user.tokenVersion,
         };
 
@@ -78,11 +75,7 @@ export const authService = {
 
         const accessToken = jwtHelper.createAccessToken(payload);
 
-        const userResponse: UserResponse = {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-        };
+        const userResponse = mapToUserResponse(user);
 
         return {
             user: userResponse,
@@ -94,7 +87,7 @@ export const authService = {
     async refresh(refreshToken: string): Promise<{ accessToken: string }> {
         const payload = jwtHelper.verifyRefreshToken(refreshToken);
 
-        const user = await usersRepository.findById(payload.userId);
+        const user = await usersRepository.findById(payload.id);
 
         if (!user) {
             throw new UnauthorizedError("User not found");
@@ -105,7 +98,7 @@ export const authService = {
         }
 
         const newPayload: JWTPayload = {
-            userId: user.id,
+            id: user.id,
             tokenVersion: user.tokenVersion,
         };
 

@@ -1,4 +1,4 @@
 export type JWTPayload = {
-    userId: number;
+    id: number;
     tokenVersion: number;
 };

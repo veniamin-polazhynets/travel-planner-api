@@ -5,6 +5,7 @@ import { validateBody } from "../middlewares/body-validation.middleware";
 import { updateUserSchema } from "../validation/users/update-user.schema";
 import { deleteUserSchema } from "../validation/users/delete-user.schema";
 import { NODE_ENV } from "../config/config";
+import { getAuthorizedUser } from "../utils/express/req.utils";
 
 export const usersRouter = express.Router();
 
@@ -13,9 +14,10 @@ usersRouter.get(
     authMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = await usersService.getProfile(req.user!.id);
+            const user = getAuthorizedUser(req);
+            const result = await usersService.getProfile(user.id);
 
-            res.status(200).json(user);
+            res.status(200).json(result);
         } catch (error) {
             next(error);
         }
@@ -28,10 +30,8 @@ usersRouter.patch(
     validateBody(updateUserSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await usersService.updateProfile(
-                req.user!.id,
-                req.body,
-            );
+            const user = getAuthorizedUser(req);
+            const result = await usersService.updateProfile(user.id, req.body);
 
             res.status(200).json(result);
         } catch (error) {
@@ -46,7 +46,8 @@ usersRouter.delete(
     validateBody(deleteUserSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await usersService.deleteAccount(req.user!.id, req.body);
+            const user = getAuthorizedUser(req);
+            await usersService.deleteAccount(user.id, req.body);
 
             res.clearCookie("refreshToken", {
                 httpOnly: true,
