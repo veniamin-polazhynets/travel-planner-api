@@ -2,8 +2,21 @@ import { ForbiddenError, NotFoundError } from "../errors/http.errors";
 import { expensesRepository } from "../repositories/expenses.repository";
 import { tripsRepository } from "../repositories/trips.repository";
 import { ExpenseResponse } from "../types/expense";
+import { mapToExpenseResponse } from "../utils/mappers/expense-mapper";
 import { CreateExpenseDto } from "../validation/expenses/create-expense.schema";
 import { UpdateExpenseDto } from "../validation/expenses/update-expense.schema";
+
+const checkTripAccess = async (userId: number, tripId: number) => {
+    const trip = await tripsRepository.findById(tripId);
+
+    if (!trip) {
+        throw new NotFoundError("Trip not found");
+    }
+
+    if (trip.userId !== userId) {
+        throw new ForbiddenError("Access denied for this trip");
+    }
+};
 
 export const expensesService = {
     async create(
@@ -11,56 +24,24 @@ export const expensesService = {
         tripId: number,
         dto: CreateExpenseDto,
     ): Promise<ExpenseResponse> {
-        const trip = await tripsRepository.findById(tripId);
-
-        if (!trip) {
-            throw new NotFoundError("Trip not found");
-        }
-
-        if (trip.userId !== userId) {
-            throw new ForbiddenError(
-                "You don't have access to this trip expenses",
-            );
-        }
+        await checkTripAccess(userId, tripId);
 
         const expenseData = { tripId, ...dto, amount: dto.amount.toFixed(2) };
 
         const expense = await expensesRepository.create(expenseData);
 
-        return {
-            id: expense.id,
-            tripId: expense.tripId,
-            title: expense.title,
-            category: expense.category,
-            amount: expense.amount,
-        };
+        return mapToExpenseResponse(expense);
     },
 
     async getAllByTripId(
         userId: number,
         tripId: number,
     ): Promise<ExpenseResponse[]> {
-        const trip = await tripsRepository.findById(tripId);
-
-        if (!trip) {
-            throw new NotFoundError("Trip not found");
-        }
-
-        if (trip.userId !== userId) {
-            throw new ForbiddenError(
-                "You don't have access to this trip expenses",
-            );
-        }
+        await checkTripAccess(userId, tripId);
 
         const result = await expensesRepository.findAllByTripId(tripId);
 
-        return result.map((expense) => ({
-            id: expense.id,
-            tripId: expense.tripId,
-            title: expense.title,
-            category: expense.category,
-            amount: expense.amount,
-        }));
+        return result.map(mapToExpenseResponse);
     },
 
     async getById(
@@ -68,37 +49,19 @@ export const expensesService = {
         tripId: number,
         expenseId: number,
     ): Promise<ExpenseResponse> {
-        const trip = await tripsRepository.findById(tripId);
+        await checkTripAccess(userId, tripId);
 
-        if (!trip) {
-            throw new NotFoundError("Trip not found");
-        }
-
-        if (trip.userId !== userId) {
-            throw new ForbiddenError(
-                "You don't have access to this trip expense",
-            );
-        }
-
-        const expense = await expensesRepository.findById(expenseId);
+        const expense = await expensesRepository.findById(tripId, expenseId);
 
         if (!expense) {
             throw new NotFoundError("Expense not found");
         }
 
         if (expense.tripId !== tripId) {
-            throw new ForbiddenError(
-                "You don't have access to this trip expense",
-            );
+            throw new ForbiddenError("Access denied for this trip");
         }
 
-        return {
-            id: expense.id,
-            tripId: expense.tripId,
-            title: expense.title,
-            category: expense.category,
-            amount: expense.amount,
-        };
+        return mapToExpenseResponse(expense);
     },
 
     async update(
@@ -107,28 +70,12 @@ export const expensesService = {
         expenseId: number,
         dto: UpdateExpenseDto,
     ): Promise<ExpenseResponse> {
-        const trip = await tripsRepository.findById(tripId);
+        await checkTripAccess(userId, tripId);
 
-        if (!trip) {
-            throw new NotFoundError("Trip not found");
-        }
-
-        if (trip.userId !== userId) {
-            throw new ForbiddenError(
-                "You don't have access to this trip expense",
-            );
-        }
-
-        const expense = await expensesRepository.findById(expenseId);
+        const expense = await expensesRepository.findById(tripId, expenseId);
 
         if (!expense) {
             throw new NotFoundError("Expense not found");
-        }
-
-        if (expense.tripId !== tripId) {
-            throw new ForbiddenError(
-                "You don't have access to this trip expense",
-            );
         }
 
         const { amount, ...restDto } = dto;
@@ -139,6 +86,7 @@ export const expensesService = {
         };
 
         const updatedExpense = await expensesRepository.update(
+            tripId,
             expenseId,
             expenseData,
         );
@@ -147,13 +95,7 @@ export const expensesService = {
             throw new NotFoundError("Expense not found during update");
         }
 
-        return {
-            id: updatedExpense.id,
-            tripId: updatedExpense.tripId,
-            title: updatedExpense.title,
-            category: updatedExpense.category,
-            amount: updatedExpense.amount,
-        };
+        return mapToExpenseResponse(updatedExpense);
     },
 
     async delete(
@@ -161,21 +103,11 @@ export const expensesService = {
         tripId: number,
         expenseId: number,
     ): Promise<void> {
-        const trip = await tripsRepository.findById(tripId);
-
-        if (!trip) {
-            throw new NotFoundError("Trip not found");
-        }
-
-        if (trip.userId !== userId) {
-            throw new ForbiddenError(
-                "You don't have access to this trip expense",
-            );
-        }
+        await checkTripAccess(userId, tripId);
 
         const deletedExpense = await expensesRepository.delete(
-            expenseId,
             tripId,
+            expenseId,
         );
 
         if (!deletedExpense) {
