@@ -38,6 +38,10 @@ export const usersService = {
 
         const updatedUser = await usersRepository.update(id, dto);
 
+        if (!updatedUser) {
+            throw new NotFoundError("User not found during update");
+        }
+
         return mapToUserResponse(updatedUser);
     },
 

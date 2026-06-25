@@ -60,7 +60,7 @@ export const usersRepository = {
             .where(eq(usersTable.id, id));
     },
 
-    async update(id: number, dao: UpdateUserDao): Promise<User> {
+    async update(id: number, dao: UpdateUserDao): Promise<User | undefined> {
         const [user] = await db
             .update(usersTable)
             .set({ ...dao, updatedAt: new Date() })
@@ -76,6 +76,6 @@ export const usersRepository = {
             .where(eq(usersTable.id, id))
             .returning(defaultUserFields);
 
-        return deletedUser || undefined;
+        return deletedUser;
     },
 };
