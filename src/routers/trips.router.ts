@@ -1,19 +1,14 @@
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validateBody } from "../middlewares/body-validation.middleware";
 import { createTripSchema } from "../validation/trips/create-trip.schema";
-import { tripsService } from "../services/trips.service";
 import { updateTripSchema } from "../validation/trips/update-trip.schema";
 import { validateQuery } from "../middlewares/query-validation.middleware";
-import {
-    QueryTripsDto,
-    queryTripsSchema,
-} from "../validation/trips/query-trips.schema";
+import { queryTripsSchema } from "../validation/trips/query-trips.schema";
 import { validateParams } from "../middlewares/params-validation.middleware";
-
 import { expensesRouter } from "./expenses.router";
 import { createIdParamSchema } from "../validation/common/id.schema";
-import { getAuthorizedUser } from "../utils/express/req.utils";
+import { tripsController } from "../controllers/trips.controller";
 
 export const tripsRouter = express.Router();
 
@@ -21,53 +16,21 @@ tripsRouter.post(
     "/",
     authMiddleware,
     validateBody(createTripSchema),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-
-            const result = await tripsService.create(user.id, req.body);
-
-            res.status(201).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    tripsController.create,
 );
 
 tripsRouter.get(
     "/",
     authMiddleware,
     validateQuery(queryTripsSchema),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const queryData = res.locals.queryData as QueryTripsDto;
-
-            const result = await tripsService.getMany(user.id, queryData);
-
-            res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    tripsController.getMany,
 );
 
 tripsRouter.get(
     "/:tripId",
     authMiddleware,
     validateParams(createIdParamSchema("tripId")),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const tripId = Number(req.params.tripId);
-
-            const result = await tripsService.getById(tripId, user.id);
-
-            res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    tripsController.getById,
 );
 
 tripsRouter.patch(
@@ -75,36 +38,14 @@ tripsRouter.patch(
     authMiddleware,
     validateParams(createIdParamSchema("tripId")),
     validateBody(updateTripSchema),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const tripId = Number(req.params.tripId);
-
-            const result = await tripsService.update(tripId, user.id, req.body);
-
-            res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    tripsController.update,
 );
 
 tripsRouter.delete(
     "/:tripId",
     authMiddleware,
     validateParams(createIdParamSchema("tripId")),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const tripId = Number(req.params.tripId);
-
-            await tripsService.delete(tripId, user.id);
-
-            res.sendStatus(204);
-        } catch (error) {
-            next(error);
-        }
-    },
+    tripsController.delete,
 );
 
 tripsRouter.use("/:tripId/expenses", expensesRouter);
