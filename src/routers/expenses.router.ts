@@ -1,12 +1,11 @@
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validateParams } from "../middlewares/params-validation.middleware";
 import { validateBody } from "../middlewares/body-validation.middleware";
 import { createExpenseSchema } from "../validation/expenses/create-expense.schema";
-import { expensesService } from "../services/expenses.service";
 import { createIdParamSchema } from "../validation/common/id.schema";
 import { updateExpenseSchema } from "../validation/expenses/update-expense.schema";
-import { getAuthorizedUser } from "../utils/express/req.utils";
+import { expensesController } from "../controllers/expenses.controller";
 
 export const expensesRouter = express.Router({ mergeParams: true });
 
@@ -15,42 +14,14 @@ expensesRouter.post(
     authMiddleware,
     validateBody(createExpenseSchema),
     validateParams(createIdParamSchema("tripId")),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const userId = user.id;
-            const tripId = Number(req.params.tripId);
-
-            const result = await expensesService.create(
-                userId,
-                tripId,
-                req.body,
-            );
-
-            res.status(201).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    expensesController.create,
 );
 
 expensesRouter.get(
     "/",
     authMiddleware,
     validateParams(createIdParamSchema("tripId")),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const userId = user.id;
-            const tripId = Number(req.params.tripId);
-
-            const result = await expensesService.getAllByTripId(userId, tripId);
-
-            res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    expensesController.getAllByTripId,
 );
 
 expensesRouter.get(
@@ -59,24 +30,7 @@ expensesRouter.get(
     validateParams(
         createIdParamSchema("tripId").merge(createIdParamSchema("expenseId")),
     ),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const userId = user.id;
-            const tripId = Number(req.params.tripId);
-            const expenseId = Number(req.params.expenseId);
-
-            const result = await expensesService.getById(
-                userId,
-                tripId,
-                expenseId,
-            );
-
-            res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    expensesController.getById,
 );
 
 expensesRouter.patch(
@@ -86,25 +40,7 @@ expensesRouter.patch(
         createIdParamSchema("tripId").merge(createIdParamSchema("expenseId")),
     ),
     validateBody(updateExpenseSchema),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const userId = user.id;
-            const tripId = Number(req.params.tripId);
-            const expenseId = Number(req.params.expenseId);
-
-            const result = await expensesService.update(
-                userId,
-                tripId,
-                expenseId,
-                req.body,
-            );
-
-            res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    expensesController.update,
 );
 
 expensesRouter.delete(
@@ -113,18 +49,5 @@ expensesRouter.delete(
     validateParams(
         createIdParamSchema("tripId").merge(createIdParamSchema("expenseId")),
     ),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const user = getAuthorizedUser(req);
-            const userId = user.id;
-            const tripId = Number(req.params.tripId);
-            const expenseId = Number(req.params.expenseId);
-
-            await expensesService.delete(userId, tripId, expenseId);
-
-            res.sendStatus(204);
-        } catch (error) {
-            next(error);
-        }
-    },
+    expensesController.delete,
 );
