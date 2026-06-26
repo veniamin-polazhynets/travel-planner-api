@@ -10,7 +10,7 @@ export const validateParams =
             return next(result.error);
         }
 
-        req.params = result.data as any;
+        res.locals.validatedParams = result.data;
 
         next();
     };

@@ -10,7 +10,7 @@ export const validateQuery =
             return next(result.error);
         }
 
-        res.locals.queryData = result.data;
+        res.locals.validatedQuery = result.data;
 
         next();
     };

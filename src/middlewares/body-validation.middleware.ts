@@ -10,7 +10,7 @@ export const validateBody =
             return next(result.error);
         }
 
-        req.body = result.data;
+        res.locals.validatedBody = result.data;
 
         next();
     };
