@@ -39,7 +39,7 @@ export const tripsService = {
         };
     },
 
-    async getById(tripId: number, userId: number): Promise<TripResponse> {
+    async getById(userId: number, tripId: number): Promise<TripResponse> {
         const trip = await tripsRepository.findById(tripId);
 
         if (!trip) {
@@ -54,8 +54,8 @@ export const tripsService = {
     },
 
     async update(
-        tripId: number,
         userId: number,
+        tripId: number,
         dto: UpdateTripDto,
     ): Promise<TripResponse> {
         const trip = await tripsRepository.findById(tripId);
@@ -84,8 +84,8 @@ export const tripsService = {
         return mapToTripResponse(updatedTrip);
     },
 
-    async delete(tripId: number, userId: number): Promise<void> {
-        const deletedTrip = await tripsRepository.delete(tripId, userId);
+    async delete(userId: number, tripId: number): Promise<void> {
+        const deletedTrip = await tripsRepository.delete(userId, tripId);
 
         if (!deletedTrip) {
             throw new NotFoundError("Trip not found");

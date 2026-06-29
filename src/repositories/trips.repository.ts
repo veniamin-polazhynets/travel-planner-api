@@ -110,7 +110,7 @@ export const tripsRepository = {
         return trip;
     },
 
-    async delete(tripId: number, userId: number): Promise<Trip | undefined> {
+    async delete(userId: number, tripId: number): Promise<Trip | undefined> {
         const [deletedTrip] = await db
             .delete(tripsTable)
             .where(

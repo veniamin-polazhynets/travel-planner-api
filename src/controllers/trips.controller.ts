@@ -33,7 +33,7 @@ export const tripsController = {
 
         const { tripId } = res.locals.validatedParams as { tripId: number };
 
-        const result = await tripsService.getById(tripId, user.id);
+        const result = await tripsService.getById(user.id, tripId);
 
         res.status(200).json(result);
     },
@@ -45,7 +45,7 @@ export const tripsController = {
 
         const body = res.locals.validatedBody as UpdateTripDto;
 
-        const result = await tripsService.update(tripId, user.id, body);
+        const result = await tripsService.update(user.id, tripId, body);
 
         res.status(200).json(result);
     },
@@ -55,7 +55,7 @@ export const tripsController = {
 
         const { tripId } = res.locals.validatedParams as { tripId: number };
 
-        await tripsService.delete(tripId, user.id);
+        await tripsService.delete(user.id, tripId);
 
         res.sendStatus(204);
     },
