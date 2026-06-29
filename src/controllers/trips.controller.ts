@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { getAuthorizedUser } from "../utils/express/req.utils";
 import { tripsService } from "../services/trips.service";
+import { getAuthorizedUser } from "../utils/express/req.utils";
 import {
     CreateTripDto,
     QueryTripsDto,
@@ -10,7 +10,6 @@ import {
 export const tripsController = {
     async create(req: Request, res: Response) {
         const user = getAuthorizedUser(req);
-
         const body = res.locals.validatedBody as CreateTripDto;
 
         const result = await tripsService.create(user.id, body);
@@ -20,7 +19,6 @@ export const tripsController = {
 
     async getMany(req: Request, res: Response) {
         const user = getAuthorizedUser(req);
-
         const query = res.locals.validatedQuery as QueryTripsDto;
 
         const result = await tripsService.getMany(user.id, query);
@@ -30,7 +28,6 @@ export const tripsController = {
 
     async getById(req: Request, res: Response) {
         const user = getAuthorizedUser(req);
-
         const { tripId } = res.locals.validatedParams as { tripId: number };
 
         const result = await tripsService.getById(user.id, tripId);
@@ -40,9 +37,7 @@ export const tripsController = {
 
     async update(req: Request, res: Response) {
         const user = getAuthorizedUser(req);
-
         const { tripId } = res.locals.validatedParams as { tripId: number };
-
         const body = res.locals.validatedBody as UpdateTripDto;
 
         const result = await tripsService.update(user.id, tripId, body);
@@ -52,7 +47,6 @@ export const tripsController = {
 
     async delete(req: Request, res: Response) {
         const user = getAuthorizedUser(req);
-
         const { tripId } = res.locals.validatedParams as { tripId: number };
 
         await tripsService.delete(user.id, tripId);

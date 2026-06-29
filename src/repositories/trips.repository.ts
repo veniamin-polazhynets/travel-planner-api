@@ -27,7 +27,6 @@ export const tripsRepository = {
             .insert(tripsTable)
             .values(dao)
             .returning(defaultTripFields);
-
         return trip;
     },
 
@@ -37,20 +36,14 @@ export const tripsRepository = {
     ): Promise<{ data: Trip[]; totalTrips: number }> {
         const { page, limit, search, country, city, sortBy, order, from, to } =
             dao;
-
         const offset = (page - 1) * limit;
 
         const whereConditions = [eq(tripsTable.userId, id)];
-
         if (search)
             whereConditions.push(ilike(tripsTable.title, `%${search}%`));
-
         if (country) whereConditions.push(eq(tripsTable.country, country));
-
         if (city) whereConditions.push(eq(tripsTable.city, city));
-
         if (from) whereConditions.push(gte(tripsTable.startDate, from));
-
         if (to) whereConditions.push(lte(tripsTable.startDate, to));
 
         const orderByColumns = {
@@ -59,9 +52,7 @@ export const tripsRepository = {
             budget: tripsTable.budget,
             createdAt: tripsTable.createdAt,
         };
-
         const orderByRow = orderByColumns[sortBy];
-
         const sortFunction = order === "asc" ? asc : desc;
         const orderByClause = sortFunction(orderByRow);
 
@@ -82,7 +73,6 @@ export const tripsRepository = {
             dataPromise,
             countPromise,
         ]);
-
         const totalTrips = countResult[0].totalTrips ?? 0;
 
         return {
@@ -96,7 +86,6 @@ export const tripsRepository = {
             .select(defaultTripFields)
             .from(tripsTable)
             .where(eq(tripsTable.id, id));
-
         return trip;
     },
 
@@ -106,7 +95,6 @@ export const tripsRepository = {
             .set({ ...dao, updatedAt: new Date() })
             .where(eq(tripsTable.id, id))
             .returning(defaultTripFields);
-
         return trip;
     },
 
@@ -117,7 +105,6 @@ export const tripsRepository = {
                 and(eq(tripsTable.id, tripId), eq(tripsTable.userId, userId)),
             )
             .returning(defaultTripFields);
-
         return deletedTrip;
     },
 };

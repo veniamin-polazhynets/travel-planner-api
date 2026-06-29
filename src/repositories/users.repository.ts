@@ -19,7 +19,6 @@ export const usersRepository = {
             .insert(usersTable)
             .values(dao)
             .returning(defaultUserFields);
-
         return user;
     },
 
@@ -28,7 +27,6 @@ export const usersRepository = {
             .select(defaultUserFields)
             .from(usersTable)
             .where(eq(usersTable.id, id));
-
         return user;
     },
 
@@ -37,7 +35,6 @@ export const usersRepository = {
             .select(defaultUserFields)
             .from(usersTable)
             .where(eq(usersTable.username, username));
-
         return user;
     },
 
@@ -46,7 +43,6 @@ export const usersRepository = {
             .select(defaultUserFields)
             .from(usersTable)
             .where(eq(usersTable.email, email));
-
         return user;
     },
 
@@ -66,7 +62,6 @@ export const usersRepository = {
             .set({ ...dao, updatedAt: new Date() })
             .where(eq(usersTable.id, id))
             .returning(defaultUserFields);
-
         return user;
     },
 
@@ -75,7 +70,6 @@ export const usersRepository = {
             .delete(usersTable)
             .where(eq(usersTable.id, id))
             .returning(defaultUserFields);
-
         return deletedUser;
     },
 };

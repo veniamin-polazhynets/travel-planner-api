@@ -7,13 +7,11 @@ import { usersRepository } from "../repositories/users.repository";
 import { UserResponse } from "../types/user";
 import { bcryptHelper } from "../utils/hash";
 import { mapToUserResponse } from "../utils/mappers/user-mapper";
-import { DeleteUserDto } from "../validation/users/delete-user.schema";
-import { UpdateUserDto } from "../validation/users/update-user.schema";
+import { DeleteUserDto, UpdateUserDto } from "../validation/users";
 
 export const usersService = {
     async getProfile(id: number): Promise<UserResponse> {
         const user = await usersRepository.findById(id);
-
         if (!user) {
             throw new NotFoundError("User not found");
         }
@@ -37,7 +35,6 @@ export const usersService = {
         }
 
         const updatedUser = await usersRepository.update(id, dto);
-
         if (!updatedUser) {
             throw new NotFoundError("User not found during update");
         }
@@ -47,7 +44,6 @@ export const usersService = {
 
     async deleteAccount(id: number, dto: DeleteUserDto): Promise<void> {
         const user = await usersRepository.findById(id);
-
         if (!user) {
             throw new NotFoundError("User not found");
         }
@@ -56,13 +52,11 @@ export const usersService = {
             dto.password,
             user.passwordHash,
         );
-
         if (!isPasswordValid) {
             throw new UnauthorizedError("Invalid password");
         }
 
         const deletedUser = await usersRepository.delete(id);
-
         if (!deletedUser) {
             throw new NotFoundError("User not found during delete");
         }

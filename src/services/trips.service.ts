@@ -1,10 +1,12 @@
 import { ForbiddenError, NotFoundError } from "../errors/http.errors";
 import { tripsRepository } from "../repositories/trips.repository";
-import { TripArrayResponse, TripResponse, UpdateTripDao } from "../types/trip";
+import { TripArrayResponse, TripResponse } from "../types/trip";
 import { mapToTripResponse } from "../utils/mappers/trip-mapper";
-import { CreateTripDto } from "../validation/trips/create-trip.schema";
-import { QueryTripsDto } from "../validation/trips/query-trips.schema";
-import { UpdateTripDto } from "../validation/trips/update-trip.schema";
+import {
+    CreateTripDto,
+    QueryTripsDto,
+    UpdateTripDto,
+} from "../validation/trips";
 
 export const tripsService = {
     async create(userId: number, dto: CreateTripDto): Promise<TripResponse> {
@@ -23,9 +25,7 @@ export const tripsService = {
             userId,
             dto,
         );
-
         const totalPages = Math.ceil(totalTrips / dto.limit);
-
         const mappedTrips = data.map(mapToTripResponse);
 
         return {
@@ -41,11 +41,9 @@ export const tripsService = {
 
     async getById(userId: number, tripId: number): Promise<TripResponse> {
         const trip = await tripsRepository.findById(tripId);
-
         if (!trip) {
             throw new NotFoundError("Trip not found");
         }
-
         if (trip.userId !== userId) {
             throw new ForbiddenError("Access denied for this trip");
         }
@@ -59,24 +57,20 @@ export const tripsService = {
         dto: UpdateTripDto,
     ): Promise<TripResponse> {
         const trip = await tripsRepository.findById(tripId);
-
         if (!trip) {
             throw new NotFoundError("Trip not found");
         }
-
         if (trip.userId !== userId) {
             throw new ForbiddenError("Access denied for this trip");
         }
 
         const { budget, ...restDto } = dto;
-
         const tripData = {
             ...restDto,
             ...(budget !== undefined ? { budget: budget.toFixed(2) } : {}),
         };
 
         const updatedTrip = await tripsRepository.update(tripId, tripData);
-
         if (!updatedTrip) {
             throw new NotFoundError("Trip not found during update");
         }
@@ -86,7 +80,6 @@ export const tripsService = {
 
     async delete(userId: number, tripId: number): Promise<void> {
         const deletedTrip = await tripsRepository.delete(userId, tripId);
-
         if (!deletedTrip) {
             throw new NotFoundError("Trip not found");
         }

@@ -19,7 +19,6 @@ export const expensesRepository = {
             .insert(expensesTable)
             .values(dao)
             .returning(defaultExpenseFields);
-
         return expense;
     },
 
@@ -28,7 +27,6 @@ export const expensesRepository = {
             .select(defaultExpenseFields)
             .from(expensesTable)
             .where(eq(expensesTable.tripId, tripId));
-
         return expenses;
     },
 
@@ -45,7 +43,6 @@ export const expensesRepository = {
                     eq(expensesTable.tripId, tripId),
                 ),
             );
-
         return expense;
     },
 
@@ -64,7 +61,6 @@ export const expensesRepository = {
                 ),
             )
             .returning(defaultExpenseFields);
-
         return expense;
     },
 
@@ -81,7 +77,6 @@ export const expensesRepository = {
                 ),
             )
             .returning(defaultExpenseFields);
-
         return deletedExpense;
     },
 };

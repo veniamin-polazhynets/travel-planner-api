@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { getAuthorizedUser } from "../utils/express/req.utils";
-import { usersService } from "../services/users.service";
 import { NODE_ENV } from "../config/config";
+import { usersService } from "../services/users.service";
+import { getAuthorizedUser } from "../utils/express/req.utils";
 import { DeleteUserDto, UpdateUserDto } from "../validation/users";
 
 export const usersController = {
@@ -15,7 +15,6 @@ export const usersController = {
 
     async updateProfile(req: Request, res: Response) {
         const user = getAuthorizedUser(req);
-
         const body = res.locals.validatedBody as UpdateUserDto;
 
         const result = await usersService.updateProfile(user.id, body);
@@ -25,7 +24,6 @@ export const usersController = {
 
     async deleteAccount(req: Request, res: Response) {
         const user = getAuthorizedUser(req);
-
         const body = res.locals.validatedBody as DeleteUserDto;
 
         await usersService.deleteAccount(user.id, body);
@@ -35,7 +33,6 @@ export const usersController = {
             sameSite: "strict",
             secure: NODE_ENV === "production",
         });
-
         res.sendStatus(204);
     },
 };

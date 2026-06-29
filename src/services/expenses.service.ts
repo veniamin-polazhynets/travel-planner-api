@@ -3,16 +3,13 @@ import { expensesRepository } from "../repositories/expenses.repository";
 import { tripsRepository } from "../repositories/trips.repository";
 import { ExpenseResponse } from "../types/expense";
 import { mapToExpenseResponse } from "../utils/mappers/expense-mapper";
-import { CreateExpenseDto } from "../validation/expenses/create-expense.schema";
-import { UpdateExpenseDto } from "../validation/expenses/update-expense.schema";
+import { CreateExpenseDto, UpdateExpenseDto } from "../validation/expenses";
 
 const checkTripAccess = async (userId: number, tripId: number) => {
     const trip = await tripsRepository.findById(tripId);
-
     if (!trip) {
         throw new NotFoundError("Trip not found");
     }
-
     if (trip.userId !== userId) {
         throw new ForbiddenError("Access denied for this trip");
     }
@@ -25,7 +22,6 @@ export const expensesService = {
         dto: CreateExpenseDto,
     ): Promise<ExpenseResponse> {
         await checkTripAccess(userId, tripId);
-
         const expenseData = { tripId, ...dto, amount: dto.amount.toFixed(2) };
 
         const expense = await expensesRepository.create(expenseData);
@@ -52,11 +48,9 @@ export const expensesService = {
         await checkTripAccess(userId, tripId);
 
         const expense = await expensesRepository.findById(tripId, expenseId);
-
         if (!expense) {
             throw new NotFoundError("Expense not found");
         }
-
         if (expense.tripId !== tripId) {
             throw new ForbiddenError("Access denied for this trip");
         }
@@ -73,13 +67,11 @@ export const expensesService = {
         await checkTripAccess(userId, tripId);
 
         const expense = await expensesRepository.findById(tripId, expenseId);
-
         if (!expense) {
             throw new NotFoundError("Expense not found");
         }
 
         const { amount, ...restDto } = dto;
-
         const expenseData = {
             ...restDto,
             ...(amount !== undefined ? { amount: amount.toFixed(2) } : {}),
@@ -90,7 +82,6 @@ export const expensesService = {
             expenseId,
             expenseData,
         );
-
         if (!updatedExpense) {
             throw new NotFoundError("Expense not found during update");
         }
@@ -109,7 +100,6 @@ export const expensesService = {
             tripId,
             expenseId,
         );
-
         if (!deletedExpense) {
             throw new NotFoundError("Expense not found");
         }
