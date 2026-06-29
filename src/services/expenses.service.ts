@@ -1,19 +1,9 @@
 import { ForbiddenError, NotFoundError } from "../errors/http.errors";
 import { expensesRepository } from "../repositories/expenses.repository";
-import { tripsRepository } from "../repositories/trips.repository";
 import { ExpenseResponse } from "../types/expense";
 import { mapToExpenseResponse } from "../utils/mappers/expense-mapper";
 import { CreateExpenseDto, UpdateExpenseDto } from "../validation/expenses";
-
-const checkTripAccess = async (userId: number, tripId: number) => {
-    const trip = await tripsRepository.findById(tripId);
-    if (!trip) {
-        throw new NotFoundError("Trip not found");
-    }
-    if (trip.userId !== userId) {
-        throw new ForbiddenError("Access denied for this trip");
-    }
-};
+import { tripsService } from "./trips.service";
 
 export const expensesService = {
     async create(
@@ -21,7 +11,7 @@ export const expensesService = {
         tripId: number,
         dto: CreateExpenseDto,
     ): Promise<ExpenseResponse> {
-        await checkTripAccess(userId, tripId);
+        await tripsService.getTripAndCheckAccess(userId, tripId);
         const expenseData = { tripId, ...dto, amount: dto.amount.toFixed(2) };
 
         const expense = await expensesRepository.create(expenseData);
@@ -33,7 +23,7 @@ export const expensesService = {
         userId: number,
         tripId: number,
     ): Promise<ExpenseResponse[]> {
-        await checkTripAccess(userId, tripId);
+        await tripsService.getTripAndCheckAccess(userId, tripId);
 
         const result = await expensesRepository.findAllByTripId(tripId);
 
@@ -45,7 +35,7 @@ export const expensesService = {
         tripId: number,
         expenseId: number,
     ): Promise<ExpenseResponse> {
-        await checkTripAccess(userId, tripId);
+        await tripsService.getTripAndCheckAccess(userId, tripId);
 
         const expense = await expensesRepository.findById(tripId, expenseId);
         if (!expense) {
@@ -64,7 +54,7 @@ export const expensesService = {
         expenseId: number,
         dto: UpdateExpenseDto,
     ): Promise<ExpenseResponse> {
-        await checkTripAccess(userId, tripId);
+        await tripsService.getTripAndCheckAccess(userId, tripId);
 
         const expense = await expensesRepository.findById(tripId, expenseId);
         if (!expense) {
@@ -94,7 +84,7 @@ export const expensesService = {
         tripId: number,
         expenseId: number,
     ): Promise<void> {
-        await checkTripAccess(userId, tripId);
+        await tripsService.getTripAndCheckAccess(userId, tripId);
 
         const deletedExpense = await expensesRepository.delete(
             tripId,

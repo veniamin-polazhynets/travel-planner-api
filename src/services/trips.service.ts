@@ -1,6 +1,6 @@
 import { ForbiddenError, NotFoundError } from "../errors/http.errors";
 import { tripsRepository } from "../repositories/trips.repository";
-import { TripArrayResponse, TripResponse } from "../types/trip";
+import { Trip, TripArrayResponse, TripResponse } from "../types/trip";
 import { mapToTripResponse } from "../utils/mappers/trip-mapper";
 import {
     CreateTripDto,
@@ -9,6 +9,17 @@ import {
 } from "../validation/trips";
 
 export const tripsService = {
+    async getTripAndCheckAccess(userId: number, tripId: number): Promise<Trip> {
+        const trip = await tripsRepository.findById(tripId);
+        if (!trip) {
+            throw new NotFoundError("Trip not found");
+        }
+        if (trip.userId !== userId) {
+            throw new ForbiddenError("Access denied for this trip");
+        }
+        return trip;
+    },
+
     async create(userId: number, dto: CreateTripDto): Promise<TripResponse> {
         const tripData = { userId, ...dto, budget: dto.budget.toFixed(2) };
 
@@ -40,13 +51,7 @@ export const tripsService = {
     },
 
     async getById(userId: number, tripId: number): Promise<TripResponse> {
-        const trip = await tripsRepository.findById(tripId);
-        if (!trip) {
-            throw new NotFoundError("Trip not found");
-        }
-        if (trip.userId !== userId) {
-            throw new ForbiddenError("Access denied for this trip");
-        }
+        const trip = await tripsService.getTripAndCheckAccess(userId, tripId);
 
         return mapToTripResponse(trip);
     },
@@ -56,13 +61,7 @@ export const tripsService = {
         tripId: number,
         dto: UpdateTripDto,
     ): Promise<TripResponse> {
-        const trip = await tripsRepository.findById(tripId);
-        if (!trip) {
-            throw new NotFoundError("Trip not found");
-        }
-        if (trip.userId !== userId) {
-            throw new ForbiddenError("Access denied for this trip");
-        }
+        await tripsService.getTripAndCheckAccess(userId, tripId);
 
         const { budget, ...restDto } = dto;
         const tripData = {
