@@ -15,6 +15,7 @@ const envSchema = z.object({
     REFRESH_TOKEN_SECRET: z.string({
         error: "REFRESH_TOKEN_SECRET is missing",
     }),
+    CLIENT_URL: z.url().default("http://localhost:5000"),
 });
 
 const envParse = envSchema.safeParse(process.env);
@@ -33,4 +34,5 @@ export const {
     DATABASE_URL,
     ACCESS_TOKEN_SECRET,
     REFRESH_TOKEN_SECRET,
+    CLIENT_URL,
 } = envParse.data;
