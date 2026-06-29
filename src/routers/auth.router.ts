@@ -4,16 +4,23 @@ import { registrationSchema } from "../validation/users/registration.schema";
 import { loginSchema } from "../validation/users/login.schema";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { authController } from "../controllers/auth.controller";
+import { rateLimiter } from "../middlewares/rate-limiter.middleware";
 
 export const authRouter = express.Router();
 
 authRouter.post(
     "/register",
+    rateLimiter,
     validateBody(registrationSchema),
     authController.register,
 );
 
-authRouter.post("/login", validateBody(loginSchema), authController.login);
+authRouter.post(
+    "/login",
+    rateLimiter,
+    validateBody(loginSchema),
+    authController.login,
+);
 
 authRouter.post("/refresh", authController.refresh);
 
