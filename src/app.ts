@@ -1,3 +1,6 @@
+import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+import { z } from "zod";
+extendZodWithOpenApi(z);
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
@@ -7,7 +10,7 @@ import { errorHandler } from "./middlewares/error.handler";
 import { authRouter } from "./routers/auth.router";
 import { tripsRouter } from "./routers/trips.router";
 import { usersRouter } from "./routers/users.router";
-import { setupSwagger } from "./config/swagger";
+import { setupSwagger } from "./config/swagger/swagger";
 
 export const app = express();
 app.use(helmet());

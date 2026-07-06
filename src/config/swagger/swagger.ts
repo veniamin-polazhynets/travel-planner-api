@@ -2,10 +2,24 @@ import {
     OpenAPIRegistry,
     OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
-import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
+import swaggerUi from "swagger-ui-express";
+import { registrationSchema } from "../../validation/users";
+import { authSwagger } from "../../routers/auth.swagger";
 
 export const registry = new OpenAPIRegistry();
+
+registry.registerComponent("securitySchemes", "bearerAuth", {
+    type: "http",
+    scheme: "bearer",
+    bearerFormat: "JWT",
+});
+
+registry.register("Registration", registrationSchema);
+
+authSwagger.forEach((route) => {
+    registry.registerPath(route);
+});
 
 export function setupSwagger(app: Express) {
     const generator = new OpenApiGeneratorV3(registry.definitions);

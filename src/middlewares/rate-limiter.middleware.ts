@@ -14,7 +14,7 @@ export const rateLimiter = rateLimit({
     ) => {
         next(
             new TooManyRequestsError(
-                "Too many attempts. Please try again after 15 minutes",
+                "Too many attempts. Please try again later",
             ),
         );
     },
