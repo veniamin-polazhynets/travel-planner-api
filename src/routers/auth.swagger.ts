@@ -6,8 +6,11 @@ import {
     tooManyRequestsResponse,
     unauthorizedResponse,
 } from "../config/swagger/swagger-errors";
-import { loginSchema, registrationSchema } from "../validation/users";
-import { userResponseSchema } from "../validation/users";
+import {
+    loginSchema,
+    registrationSchema,
+    userResponseSchema,
+} from "../validation/users";
 
 export const authSwagger: RouteConfig[] = [
     {
@@ -119,9 +122,7 @@ export const authSwagger: RouteConfig[] = [
         path: "/auth/logout",
         summary: "Log Out",
         tags: ["Auth"],
-
         security: [{ bearerAuth: [] }],
-
         responses: {
             200: {
                 description: "Successfully logged out",

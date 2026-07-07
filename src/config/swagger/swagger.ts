@@ -4,8 +4,15 @@ import {
 } from "@asteasolutions/zod-to-openapi";
 import { Express } from "express";
 import swaggerUi from "swagger-ui-express";
-import { registrationSchema } from "../../validation/users";
 import { authSwagger } from "../../routers/auth.swagger";
+import { usersSwagger } from "../../routers/users.swagger";
+import {
+    deleteUserSchema,
+    loginSchema,
+    registrationSchema,
+    updateUserSchema,
+    userResponseSchema,
+} from "../../validation/users";
 
 export const registry = new OpenAPIRegistry();
 
@@ -15,9 +22,16 @@ registry.registerComponent("securitySchemes", "bearerAuth", {
     bearerFormat: "JWT",
 });
 
-registry.register("Registration", registrationSchema);
+registry.register("RegistrationRequest", registrationSchema);
+registry.register("LoginRequest", loginSchema);
+registry.register("UserResponse", userResponseSchema);
+registry.register("UpdateUserRequest", updateUserSchema);
+registry.register("DeleteUserRequest", deleteUserSchema);
 
 authSwagger.forEach((route) => {
+    registry.registerPath(route);
+});
+usersSwagger.forEach((route) => {
     registry.registerPath(route);
 });
 

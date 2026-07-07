@@ -12,7 +12,7 @@ export const loginSchema = z.object({
         .string()
         .min(8)
         .max(100)
-        .openapi({ description: "Secure password", example: "1234567890" }),
+        .openapi({ description: "User password", example: "1234567890" }),
 });
 
 export type LoginDto = z.infer<typeof loginSchema>;
