@@ -8,14 +8,14 @@ const envSchema = z.object({
         .enum(["development", "production", "test"])
         .default("development"),
     PORT: z.coerce.number().default(8000),
-    DATABASE_URL: z.string({ error: "DATABASE_URL is missing" }),
+    DATABASE_URL: z.string({ required_error: "DATABASE_URL is missing" }),
     ACCESS_TOKEN_SECRET: z.string({
-        error: "ACCESS_TOKEN_SECRET is missing",
+        required_error: "ACCESS_TOKEN_SECRET is missing",
     }),
     REFRESH_TOKEN_SECRET: z.string({
-        error: "REFRESH_TOKEN_SECRET is missing",
+        required_error: "REFRESH_TOKEN_SECRET is missing",
     }),
-    CLIENT_URL: z.url().default("http://localhost:5000"),
+    CLIENT_URL: z.string().url().default("http://localhost:5000"),
 });
 
 const envParse = envSchema.safeParse(process.env);
@@ -23,7 +23,7 @@ const envParse = envSchema.safeParse(process.env);
 if (!envParse.success) {
     console.error(
         "Invalid environment configuration:",
-        z.prettifyError(envParse.error),
+        JSON.stringify(envParse.error.format(), null, 2),
     );
     throw new Error("Fix your .env file before running the server");
 }
