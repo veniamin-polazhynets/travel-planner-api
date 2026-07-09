@@ -13,6 +13,13 @@ import {
     updateUserSchema,
     userResponseSchema,
 } from "../../validation/users";
+import { tripsSwagger } from "../../routers/trips.swagger";
+import {
+    createTripSchema,
+    tripResponseSchema,
+    tripsArrayResponseSchema,
+    updateTripSchema,
+} from "../../validation/trips";
 
 export const registry = new OpenAPIRegistry();
 
@@ -27,11 +34,18 @@ registry.register("LoginRequest", loginSchema);
 registry.register("UserResponse", userResponseSchema);
 registry.register("UpdateUserRequest", updateUserSchema);
 registry.register("DeleteUserRequest", deleteUserSchema);
+registry.register("CreateTripRequest", createTripSchema);
+registry.register("UpdateTripRequest", updateTripSchema);
+registry.register("TripResponse", tripResponseSchema);
+registry.register("TripsArrayResponse", tripsArrayResponseSchema);
 
 authSwagger.forEach((route) => {
     registry.registerPath(route);
 });
 usersSwagger.forEach((route) => {
+    registry.registerPath(route);
+});
+tripsSwagger.forEach((route) => {
     registry.registerPath(route);
 });
 
