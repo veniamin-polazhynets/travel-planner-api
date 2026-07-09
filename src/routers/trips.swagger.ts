@@ -5,10 +5,10 @@ import {
     notFoundResponse,
     unauthorizedResponse,
 } from "../config/swagger/swagger-errors";
-import { createIdParamSchema } from "../validation/common";
 import {
     createTripSchema,
     queryTripsSchema,
+    tripParamsSchema,
     tripResponseSchema,
     tripsArrayResponseSchema,
     updateTripSchema,
@@ -74,7 +74,7 @@ export const tripsSwagger: RouteConfig[] = [
         tags: ["Trips"],
         security: [{ bearerAuth: [] }],
         request: {
-            params: createIdParamSchema("tripId"),
+            params: tripParamsSchema,
         },
         responses: {
             200: {
@@ -99,7 +99,7 @@ export const tripsSwagger: RouteConfig[] = [
         tags: ["Trips"],
         security: [{ bearerAuth: [] }],
         request: {
-            params: createIdParamSchema("tripId"),
+            params: tripParamsSchema,
             body: {
                 content: {
                     "application/json": { schema: updateTripSchema },
@@ -129,7 +129,7 @@ export const tripsSwagger: RouteConfig[] = [
         tags: ["Trips"],
         security: [{ bearerAuth: [] }],
         request: {
-            params: createIdParamSchema("tripId"),
+            params: tripParamsSchema,
         },
         responses: {
             204: {

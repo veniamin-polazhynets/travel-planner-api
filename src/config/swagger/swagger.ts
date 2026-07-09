@@ -5,7 +5,21 @@ import {
 import { Express } from "express";
 import swaggerUi from "swagger-ui-express";
 import { authSwagger } from "../../routers/auth.swagger";
+import { expensesSwagger } from "../../routers/expenses.swagger";
+import { tripsSwagger } from "../../routers/trips.swagger";
 import { usersSwagger } from "../../routers/users.swagger";
+import {
+    createExpenseSchema,
+    expenseArrayResponseSchema,
+    expenseResponseSchema,
+    updateExpenseSchema,
+} from "../../validation/expenses";
+import {
+    createTripSchema,
+    tripResponseSchema,
+    tripsArrayResponseSchema,
+    updateTripSchema,
+} from "../../validation/trips";
 import {
     deleteUserSchema,
     loginSchema,
@@ -13,13 +27,6 @@ import {
     updateUserSchema,
     userResponseSchema,
 } from "../../validation/users";
-import { tripsSwagger } from "../../routers/trips.swagger";
-import {
-    createTripSchema,
-    tripResponseSchema,
-    tripsArrayResponseSchema,
-    updateTripSchema,
-} from "../../validation/trips";
 
 export const registry = new OpenAPIRegistry();
 
@@ -38,6 +45,10 @@ registry.register("CreateTripRequest", createTripSchema);
 registry.register("UpdateTripRequest", updateTripSchema);
 registry.register("TripResponse", tripResponseSchema);
 registry.register("TripsArrayResponse", tripsArrayResponseSchema);
+registry.register("CreateExpenseRequest", createExpenseSchema);
+registry.register("UpdateExpenseRequest", updateExpenseSchema);
+registry.register("ExpenseResponse", expenseResponseSchema);
+registry.register("ExpenseArrayResponse", expenseArrayResponseSchema);
 
 authSwagger.forEach((route) => {
     registry.registerPath(route);
@@ -46,6 +57,9 @@ usersSwagger.forEach((route) => {
     registry.registerPath(route);
 });
 tripsSwagger.forEach((route) => {
+    registry.registerPath(route);
+});
+expensesSwagger.forEach((route) => {
     registry.registerPath(route);
 });
 
