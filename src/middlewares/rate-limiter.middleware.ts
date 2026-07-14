@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import rateLimit, { Options } from "express-rate-limit";
 import { TooManyRequestsError } from "../errors/http.errors";
+import { NODE_ENV } from "../config/config";
 
 export const rateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 5,
+    limit: NODE_ENV === "test" ? 1000 : 5,
 
     handler: (
         req: Request,
