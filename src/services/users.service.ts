@@ -53,7 +53,7 @@ export const usersService = {
             user.passwordHash,
         );
         if (!isPasswordValid) {
-            throw new UnauthorizedError("Invalid password");
+            throw new UnauthorizedError("Incorrect password");
         }
 
         const deletedUser = await usersRepository.delete(id);

@@ -164,7 +164,7 @@ describe("Auth", () => {
             );
         });
 
-        it("should return 401 when password is wrong", async () => {
+        it("should return 401 when password is incorrect", async () => {
             const { credentials } = await createUser();
 
             const response = await request(app).post("/auth/login").send({
