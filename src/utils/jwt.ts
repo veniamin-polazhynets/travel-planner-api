@@ -17,28 +17,42 @@ export const jwtHelper = {
     },
 
     verifyRefreshToken(refreshToken: string): JWTPayload {
-        const decoded = jsonwebtoken.verify(refreshToken, REFRESH_TOKEN_SECRET);
+        try {
+            const decoded = jsonwebtoken.verify(
+                refreshToken,
+                REFRESH_TOKEN_SECRET,
+            );
 
-        if (!decoded || typeof decoded === "string" || !decoded.id) {
-            throw new UnauthorizedError("Invalid token payload");
+            if (!decoded || typeof decoded === "string" || !decoded.id) {
+                throw new UnauthorizedError("Invalid token payload");
+            }
+
+            return {
+                id: decoded.id,
+                tokenVersion: decoded.tokenVersion,
+            };
+        } catch (error) {
+            throw new UnauthorizedError("Invalid or expired token");
         }
-
-        return {
-            id: decoded.id,
-            tokenVersion: decoded.tokenVersion,
-        };
     },
 
     verifyAccessToken(accessToken: string): JWTPayload {
-        const decoded = jsonwebtoken.verify(accessToken, ACCESS_TOKEN_SECRET);
+        try {
+            const decoded = jsonwebtoken.verify(
+                accessToken,
+                ACCESS_TOKEN_SECRET,
+            );
 
-        if (!decoded || typeof decoded === "string" || !decoded.id) {
-            throw new UnauthorizedError("Invalid token payload");
+            if (!decoded || typeof decoded === "string" || !decoded.id) {
+                throw new UnauthorizedError("Invalid token payload");
+            }
+
+            return {
+                id: decoded.id,
+                tokenVersion: decoded.tokenVersion,
+            };
+        } catch (error) {
+            throw new UnauthorizedError("Invalid or expired token");
         }
-
-        return {
-            id: decoded.id,
-            tokenVersion: decoded.tokenVersion,
-        };
     },
 };
