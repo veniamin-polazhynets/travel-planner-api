@@ -11,4 +11,10 @@ export const expenseResponseSchema = z
             example: 1,
         }),
     })
-    .merge(baseExpenseSchema);
+    .merge(baseExpenseSchema)
+    .extend({
+        amount: z.string().openapi({
+            description: "Expense amount in USD",
+            example: "200.00",
+        }),
+    });

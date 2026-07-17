@@ -5,4 +5,10 @@ export const tripResponseSchema = z
     .object({
         id: z.number().openapi({ description: "Trip unique ID", example: 1 }),
     })
-    .merge(baseTripSchema);
+    .merge(baseTripSchema)
+    .extend({
+        budget: z.string().openapi({
+            description: "Trip budget in USD",
+            example: "1500.00",
+        }),
+    });
