@@ -1,6 +1,7 @@
-import request from "supertest";
-import { RegistrationDto } from "../validation/users";
+import request, { Response } from "supertest";
 import { app } from "../app";
+import { CreateTripDto } from "../validation/trips";
+import { RegistrationDto } from "../validation/users";
 
 export const generateCredentials = () => {
     const random = Date.now().toString();
@@ -28,6 +29,81 @@ export const createUser = async () => {
         accessToken: regResponse.body.accessToken,
         regResponse,
     };
+};
+
+export const generateTripData = (
+    overrides?: Partial<CreateTripDto>,
+    index?: number,
+) => {
+    const random = Date.now().toString() + (index ?? "");
+
+    const tripData = {
+        title: `Trip to Italy ${random}`,
+        country: "Italy",
+        city: "Rome",
+        startDate: "2026-06-01",
+        endDate: "2026-06-30",
+        budget: 1000 + (index ?? 0),
+    };
+
+    return { ...tripData, ...overrides };
+};
+
+export const createTrip = async (
+    accessToken: string,
+    tripData: CreateTripDto,
+) => {
+    const response = await request(app)
+        .post("/trips")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send(tripData);
+
+    return response.body;
+};
+
+export const createManyTrips = async (accessToken: string, count: number) => {
+    for (let i = 0; i < count; i++) {
+        const tripData = generateTripData(undefined, i);
+        await createTrip(accessToken, tripData);
+    }
+};
+
+export const expectTripsListData = (
+    response: Response,
+    dataLength?: number,
+) => {
+    expect(response.body).toHaveProperty("data");
+    expect(response.body).toHaveProperty("meta");
+    if (dataLength !== undefined) {
+        expect(response.body.data.length).toBe(dataLength);
+    } else {
+        expect(response.body.data).toEqual([]);
+    }
+};
+
+export const expectTripsListMeta = (
+    response: Response,
+    totalItems?: number,
+    totalPages?: number,
+    currentPage?: number,
+    pageSize?: number,
+) => {
+    expect(response.body.meta).toHaveProperty("totalItems");
+    expect(response.body.meta).toHaveProperty("totalPages");
+    expect(response.body.meta).toHaveProperty("currentPage");
+    expect(response.body.meta).toHaveProperty("pageSize");
+    if (totalItems !== undefined) {
+        expect(response.body.meta.totalItems).toBe(totalItems);
+    }
+    if (totalPages !== undefined) {
+        expect(response.body.meta.totalPages).toBe(totalPages);
+    }
+    if (currentPage !== undefined) {
+        expect(response.body.meta.currentPage).toBe(currentPage);
+    }
+    if (pageSize !== undefined) {
+        expect(response.body.meta.pageSize).toBe(pageSize);
+    }
 };
 
 export const testUnauthorizedCases = (
