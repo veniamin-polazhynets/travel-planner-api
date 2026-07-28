@@ -1,5 +1,7 @@
 import request, { Response } from "supertest";
 import { app } from "../app";
+import { ExpenseCategory } from "../types/expense";
+import { CreateExpenseDto } from "../validation/expenses";
 import { CreateTripDto } from "../validation/trips";
 import { RegistrationDto } from "../validation/users";
 
@@ -103,6 +105,45 @@ export const expectTripsListMeta = (
     }
     if (pageSize !== undefined) {
         expect(response.body.meta.pageSize).toBe(pageSize);
+    }
+};
+
+export const generateExpenseData = (
+    overrides?: Partial<CreateExpenseDto>,
+    index?: number,
+) => {
+    const random = Date.now().toString() + (index ?? "");
+
+    const expenseData = {
+        title: `Dinner at Tonnarello San Pietro ${random}`,
+        category: "food" as ExpenseCategory,
+        amount: 200 + (index ?? 0),
+    };
+
+    return { ...expenseData, ...overrides };
+};
+
+export const createExpense = async (
+    accessToken: string,
+    tripId: number,
+    expenseData: CreateExpenseDto,
+) => {
+    const response = await request(app)
+        .post(`/trips/${tripId}/expenses`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send(expenseData);
+
+    return response.body;
+};
+
+export const createManyExpenses = async (
+    accessToken: string,
+    tripId: number,
+    count: number,
+) => {
+    for (let i = 0; i < count; i++) {
+        const expenseData = generateExpenseData(undefined, i);
+        await createExpense(accessToken, tripId, expenseData);
     }
 };
 
