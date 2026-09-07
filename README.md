@@ -1,7 +1,7 @@
 # 🌍 Travel Planner API
 
 [![Node.js](https://img.shields.io/badge/20.x-green?style=flat&logo=Node.js&logoColor=green&label=Node.js&color=green)](https://nodejs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Express](https://img.shields.io/badge/Express-5.x-lightgrey?logo=express)](https://expressjs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
 [![Drizzle](https://img.shields.io/badge/Drizzle_ORM-0.45-green?logo=drizzle)](https://orm.drizzle.team/)
